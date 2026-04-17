@@ -11,6 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Image from "next/image";
+import { ModeToggle } from "@/components/Modetoggle";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
@@ -63,6 +64,7 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
+          <ModeToggle />
           <Link href="/sign-in">
             <Button variant="ghost" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
               Sign In

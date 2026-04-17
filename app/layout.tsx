@@ -3,6 +3,7 @@ import { Exo_2, Noto_Sans_Avestan } from "next/font/google";
 import "./globals.css";
 import Navbar from "./_shared/Navbar";
 import Footer from "./_shared/Footer";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const exo = Exo_2({
   variable: "--font-exo",
@@ -22,13 +23,20 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="en" suppressHydrationWarning
       className={`${exo.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        {children}
-        <Footer />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          {children}
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
