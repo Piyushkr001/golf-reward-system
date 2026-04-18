@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 
 
@@ -20,6 +22,8 @@ export default function PricingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Check if user has a session cookie
@@ -36,6 +40,38 @@ export default function PricingPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const handleSelectPlan = async (plan: Plan) => {
+    if (!isAuthenticated) {
+      router.push("/sign-up");
+      return;
+    }
+
+    setProcessingPlan(plan.id);
+    try {
+      const res = await fetch("/api/subscriptions/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planSlug: plan.slug }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        toast.success(`Successfully subscribed to ${plan.name} plan!`);
+        router.push("/dashboard/billing");
+      } else {
+        toast.error(data.message || "Something went wrong");
+        if (data.message?.toLowerCase().includes("already active")) {
+           router.push("/dashboard/billing");
+        }
+      }
+    } catch (error) {
+      toast.error("Failed to process subscription");
+    } finally {
+      setProcessingPlan(null);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-black text-slate-100 selection:bg-cyan-500/30 flex flex-col">
@@ -114,16 +150,17 @@ export default function PricingPage() {
                         </span>
                       </p>
 
-                      <Link href={isAuthenticated ? "/dashboard/billing" : "/sign-up"} className="mt-6 block">
-                        <Button
-                          className={`w-full py-6 text-lg rounded-xl ${isYearly
-                              ? "bg-cyan-500 hover:bg-cyan-400 text-black font-bold"
-                              : "bg-white/10 hover:bg-white/20 text-white"
-                            }`}
-                        >
-                          Get started today
-                        </Button>
-                      </Link>
+                      <Button
+                        onClick={() => handleSelectPlan(plan)}
+                        disabled={processingPlan === plan.id}
+                        className={`w-full mt-6 py-6 text-lg rounded-xl flex items-center justify-center gap-2 ${isYearly
+                            ? "bg-cyan-500 hover:bg-cyan-400 text-black font-bold"
+                            : "bg-white/10 hover:bg-white/20 text-white"
+                          }`}
+                      >
+                        {processingPlan === plan.id ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+                        Get started today
+                      </Button>
 
                       <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-slate-300 xl:mt-10">
                         {features.map((feature) => (
