@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,19 +12,18 @@ import { ArrowLeft, Loader2, Mail } from 'lucide-react';
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
     
     try {
       await axios.post('/api/auth/forgot-password', { email });
+      toast.success("Password reset email sent!");
       setSuccess(true);
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Failed to send reset email');
+      toast.error(err.response?.data?.error || err.message || 'Failed to send reset email');
     } finally {
       setLoading(false);
     }
@@ -61,12 +61,6 @@ export default function ForgotPasswordPage() {
         </div>
       ) : (
         <>
-          {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium">
-              {error}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">Email Address</Label>

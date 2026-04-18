@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,13 +22,13 @@ export default function SignInPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       await axios.post('/api/auth/login', { email, password, role: 'user' });
+      toast.success("Successfully logged in!");
       router.push('/onboarding/user');
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Login failed');
+      toast.error(err.response?.data?.error || err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -36,9 +37,10 @@ export default function SignInPage() {
   const handleGoogleSuccess = async (response: any) => {
     try {
       await axios.post('/api/auth/google', { credential: response.credential, role: 'user' });
+      toast.success("Google sign-in successful!");
       router.push('/onboarding/user');
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Google auth failed');
+      toast.error(err.response?.data?.error || err.message || 'Google auth failed');
     }
   };
 
@@ -50,16 +52,10 @@ export default function SignInPage() {
           <p className="text-slate-600 dark:text-slate-400">Sign in to your PlayLance account.</p>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium">
-            {error}
-          </div>
-        )}
-
         <div className="mb-6 flex justify-center">
           <GoogleLogin 
             onSuccess={handleGoogleSuccess} 
-            onError={() => setError('Google Sign In failed')}
+            onError={() => toast.error('Google Sign In failed')}
             shape="pill"
             theme="filled_blue"
             text="signin_with"

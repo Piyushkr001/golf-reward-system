@@ -5,6 +5,8 @@ import Navbar from "./_shared/Navbar";
 import Footer from "./_shared/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
 
+import { Toaster } from "react-hot-toast";
+
 const exo = Exo_2({
   variable: "--font-exo",
   subsets: ["latin"],
@@ -33,6 +35,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Toaster position="top-center" reverseOrder={false} />
           <Navbar />
           {children}
           <Footer />

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,13 +15,11 @@ export default function AdminSignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const res = await axios.post('/api/auth/login', { email, password, role: 'admin' });
@@ -30,9 +29,10 @@ export default function AdminSignInPage() {
         throw new Error('Access Denied. You do not have admin privileges.');
       }
 
+      toast.success("Successfully logged in as Admin!");
       router.push('/onboarding/admin');
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Login failed');
+      toast.error(err.response?.data?.error || err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -51,12 +51,6 @@ export default function AdminSignInPage() {
         <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-2">Admin Portal</h1>
         <p className="text-slate-600 dark:text-slate-400">Sign in to manage the platform.</p>
       </div>
-
-      {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium">
-          {error}
-        </div>
-      )}
 
       <form onSubmit={handleLogin} className="flex flex-col gap-6">
         <div className="flex flex-col gap-2 relative">

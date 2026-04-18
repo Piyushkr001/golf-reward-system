@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { usePathname } from "next/navigation";
+import toast from "react-hot-toast";
 import { Menu, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -39,8 +40,16 @@ export default function Navbar() {
   }, [pathname]);
 
   const handleSignOut = async () => {
-    await axios.post('/api/auth/logout');
-    window.location.href = '/';
+    try {
+      await axios.post('/api/auth/logout');
+      toast.success("Signed out successfully!");
+      // Adding a small delay for the toast to be seen before reload
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 800);
+    } catch {
+      toast.error("Failed to sign out");
+    }
   };
 
   const isActive = (href: string) => {

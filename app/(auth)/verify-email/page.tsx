@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 
@@ -12,23 +13,22 @@ function VerifyEmailForm() {
   const token = searchParams.get('token');
 
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (!token) {
       setStatus('error');
-      setMessage('Missing verification token.');
+      toast.error('Missing verification token.');
       return;
     }
 
     axios.post('/api/auth/verify-email', { token })
       .then((res) => {
         setStatus('success');
-        setMessage(res.data.message || 'Email verified successfully!');
+        toast.success(res.data.message || 'Email verified successfully!');
       })
       .catch((err) => {
         setStatus('error');
-        setMessage(err.response?.data?.error || 'Verification failed. The link may have expired.');
+        toast.error(err.response?.data?.error || 'Verification failed. The link may have expired.');
       });
   }, [token]);
 
@@ -47,7 +47,7 @@ function VerifyEmailForm() {
       <div className="text-center py-8">
         <CheckCircle2 className="h-16 w-16 mx-auto text-emerald-500 mb-6" />
         <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Email Verified!</h2>
-        <p className="text-slate-500 mb-8">{message}</p>
+        <p className="text-slate-500 mb-8">You can now access your account.</p>
         <Button size="lg" className="w-full bg-linear-to-r from-violet-600 to-cyan-500" onClick={() => router.push('/sign-in')}>
           Continue to Login
         </Button>
@@ -59,7 +59,7 @@ function VerifyEmailForm() {
     <div className="text-center py-8">
       <XCircle className="h-16 w-16 mx-auto text-red-500 mb-6" />
       <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Verification Failed</h2>
-      <p className="text-slate-500 mb-8">{message}</p>
+      <p className="text-slate-500 mb-8">Please try again or request a new link.</p>
       <Button variant="outline" size="lg" className="w-full" onClick={() => router.push('/forgot-password')}>
         Contact Support
       </Button>
