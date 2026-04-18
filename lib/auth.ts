@@ -17,7 +17,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 // Create JWT token and set in cookies
-export async function createSession(userId: number, role: string) {
+export async function createSession(userId: string, role: string) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   const token = await new SignJWT({ userId, role })
@@ -42,7 +42,7 @@ export async function getSession() {
 
   try {
     const { payload } = await jwtVerify(sessionToken, JWT_SECRET);
-    return payload as { userId: number; role: string };
+    return payload as { userId: string; role: string };
   } catch (err) {
     return null;
   }
