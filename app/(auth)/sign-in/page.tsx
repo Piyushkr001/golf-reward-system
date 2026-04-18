@@ -25,7 +25,7 @@ export default function SignInPage() {
 
     try {
       await axios.post('/api/auth/login', { email, password, role: 'user' });
-      router.push('/dashboard');
+      router.push('/onboarding/user');
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || 'Login failed');
     } finally {
@@ -36,7 +36,7 @@ export default function SignInPage() {
   const handleGoogleSuccess = async (response: any) => {
     try {
       await axios.post('/api/auth/google', { credential: response.credential, role: 'user' });
-      router.push('/dashboard');
+      router.push('/onboarding/user');
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || 'Google auth failed');
     }

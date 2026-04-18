@@ -30,7 +30,7 @@ export default function AdminSignInPage() {
         throw new Error('Access Denied. You do not have admin privileges.');
       }
 
-      router.push('/dashboard/admin');
+      router.push('/onboarding/admin');
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || 'Login failed');
     } finally {
