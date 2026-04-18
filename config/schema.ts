@@ -27,6 +27,16 @@ export const onboardingStepEnum = pgEnum("onboarding_step", [
   "admin_complete",
 ]);
 
+export const charityCategoryEnum = pgEnum("charity_category", [
+  "education",
+  "sports",
+  "health",
+  "environment",
+  "community",
+  "other",
+]);
+
+
 export const users = pgTable(
   "users",
   {
@@ -73,3 +83,26 @@ export const onboardingProfiles = pgTable("onboarding_profiles", {
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 });
+
+
+export const charities = pgTable(
+  "charities",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    shortDescription: text("short_description").notNull(),
+    fullDescription: text("full_description").notNull(),
+    imageUrl: text("image_url"),
+    websiteUrl: text("website_url"),
+    category: charityCategoryEnum("category").notNull().default("other"),
+    featured: boolean("featured").notNull().default(false),
+    isActive: boolean("is_active").notNull().default(true),
+    displayOrder: integer("display_order").notNull().default(0),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    slugIdx: uniqueIndex("charities_slug_idx").on(table.slug),
+  })
+);
