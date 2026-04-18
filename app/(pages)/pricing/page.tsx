@@ -22,6 +22,7 @@ export default function PricingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activePlanId, setActivePlanId] = useState<string | null>(null);
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const router = useRouter();
 
@@ -29,6 +30,14 @@ export default function PricingPage() {
     // Check if user has a session cookie
     if (document.cookie.includes('session=')) {
       setIsAuthenticated(true);
+      fetch("/api/subscriptions/current")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.subscription?.status === "active") {
+            setActivePlanId(data.subscription.planId);
+          }
+        })
+        .catch(() => {});
     }
     
     fetch("/api/subscriptions/plans")
@@ -100,6 +109,7 @@ export default function PricingPage() {
               <div className="isolate mx-auto grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
                 {plans.map((plan) => {
                   const isYearly = plan.interval === "yearly";
+                  const isActivePlan = activePlanId === plan.id;
                   const formattedPrice = new Intl.NumberFormat("en-US", {
                     style: "currency",
                     currency: plan.currency,
@@ -152,14 +162,14 @@ export default function PricingPage() {
 
                       <Button
                         onClick={() => handleSelectPlan(plan)}
-                        disabled={processingPlan === plan.id}
+                        disabled={processingPlan === plan.id || isActivePlan}
                         className={`w-full mt-6 py-6 text-lg rounded-xl flex items-center justify-center gap-2 ${isYearly
                             ? "bg-cyan-500 hover:bg-cyan-400 text-black font-bold"
                             : "bg-white/10 hover:bg-white/20 text-white"
-                          }`}
+                          } ${isActivePlan ? "opacity-50 cursor-not-allowed" : ""}`}
                       >
                         {processingPlan === plan.id ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
-                        Get started today
+                        {isActivePlan ? "Active Plan" : "Get started today"}
                       </Button>
 
                       <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-slate-300 xl:mt-10">
