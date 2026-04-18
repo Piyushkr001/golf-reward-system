@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CreditCard, Loader2 } from "lucide-react";
 import { OnboardingShell } from "../../_shared/OnboardingShell";
@@ -8,26 +8,32 @@ import { ProgressStepper } from "../../_shared/ProgressStepper";
 import { Button } from "@/components/ui/button";
 
 
-const PLANS = [
-  {
-    id: "monthly",
-    title: "Monthly Plan",
-    price: "$19/mo",
-    description: "Flexible access with monthly billing and core subscriber participation.",
-  },
-  {
-    id: "yearly",
-    title: "Yearly Plan",
-    price: "$190/yr",
-    description: "Best-value annual subscription with long-term participation benefits.",
-  },
-];
+type Plan = {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  interval: "monthly" | "yearly";
+  currency: string;
+};
 
 export default function SubscriptionPlanPage() {
   const router = useRouter();
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [selected, setSelected] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/subscriptions/plans")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setPlans(data.plans);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setFetching(false));
+  }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -70,30 +76,49 @@ export default function SubscriptionPlanPage() {
           </div>
         }
       >
-        <div className="grid gap-4 lg:grid-cols-2">
-          {PLANS.map((plan) => {
-            const active = selected === plan.id;
-            return (
-              <button
-                key={plan.id}
-                type="button"
-                onClick={() => setSelected(plan.id)}
-                className={`rounded-3xl border p-6 text-left transition ${
-                  active ? "border-cyan-400 bg-cyan-400/10" : "border-white/10 bg-white/5 hover:bg-white/10"
-                }`}
-              >
-                <h3 className="text-xl font-semibold text-white">{plan.title}</h3>
-                <p className="mt-2 text-3xl font-bold text-cyan-300">{plan.price}</p>
-                <p className="mt-3 text-sm leading-6 text-slate-300">{plan.description}</p>
-              </button>
-            );
-          })}
-        </div>
+        {fetching ? (
+          <div className="flex h-32 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+          </div>
+        ) : (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {plans.map((plan) => {
+              const active = selected === plan.slug;
+              const formattedPrice = new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: plan.currency,
+              }).format(plan.price / 100);
+
+              const description = plan.interval === "monthly" 
+                ? "Flexible access with monthly billing and core subscriber participation."
+                : "Best-value annual subscription with long-term participation benefits.";
+
+              const displayInterval = plan.interval === "monthly" ? "/mo" : "/yr";
+
+              return (
+                <button
+                  key={plan.id}
+                  type="button"
+                  onClick={() => setSelected(plan.slug)}
+                  className={`rounded-3xl border p-6 text-left transition ${
+                    active ? "border-cyan-400 bg-cyan-400/10" : "border-white/10 bg-white/5 hover:bg-white/10"
+                  }`}
+                >
+                  <h3 className="text-xl font-semibold text-white">{plan.name}</h3>
+                  <p className="mt-2 text-3xl font-bold text-cyan-300">
+                    {formattedPrice}<span className="text-sm text-slate-400 font-normal">{displayInterval}</span>
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-slate-300">{description}</p>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {error ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
 
         <div className="mt-8 flex justify-end">
-          <Button onClick={handleSubmit} disabled={loading} className="h-12 rounded-2xl bg-linear-to-r from-violet-600 to-cyan-500 px-6 text-white">
+          <Button onClick={handleSubmit} disabled={loading || fetching} className="h-12 rounded-2xl bg-linear-to-r from-violet-600 to-cyan-500 px-6 text-white">
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Finish Setup
           </Button>

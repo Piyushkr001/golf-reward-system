@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/config/db";
 import { onboardingProfiles } from "@/config/schema";
 import { getCurrentDbUser } from "@/lib/current-user";
+import { getPlanBySlug } from "@/lib/subscriptions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +15,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const selectedPlan = String(body.selectedPlan || "").trim();
 
-    if (!["monthly", "yearly"].includes(selectedPlan)) {
+    const plan = await getPlanBySlug(selectedPlan);
+    if (!plan) {
       return NextResponse.json({ success: false, message: "Please select a valid plan" }, { status: 400 });
     }
 
