@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "@/config/db";
-import { onboardingProfiles } from "@/config/schema";
+import { onboardingProfiles, charities } from "@/config/schema";
 import { getCurrentDbUser } from "@/lib/current-user";
 
 export async function POST(req: NextRequest) {
@@ -16,6 +16,12 @@ export async function POST(req: NextRequest) {
 
     if (!charityId) {
       return NextResponse.json({ success: false, message: "Please select a charity" }, { status: 400 });
+    }
+
+    const validCharity = await db.select().from(charities).where(and(eq(charities.id, charityId), eq(charities.isActive, true))).limit(1);
+
+    if (!validCharity || validCharity.length === 0) {
+      return NextResponse.json({ success: false, message: "Invalid or inactive charity selected" }, { status: 400 });
     }
 
     await db

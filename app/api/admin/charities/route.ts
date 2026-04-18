@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { db } from "@/config/db";
 import { charities } from "@/config/schema";
 import { getCurrentDbUser } from "@/lib/current-user";
@@ -55,6 +56,12 @@ export async function POST(req: NextRequest) {
     }
 
     const slug = slugify(name);
+
+    const existingCharity = await db.select().from(charities).where(eq(charities.slug, slug)).limit(1);
+    
+    if (existingCharity && existingCharity.length > 0) {
+      return NextResponse.json({ success: false, message: "Charity already exists" }, { status: 400 });
+    }
 
     await db.insert(charities).values({
       id: crypto.randomUUID(),

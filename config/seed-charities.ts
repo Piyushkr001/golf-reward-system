@@ -45,7 +45,7 @@ async function seed() {
       isActive: true,
       displayOrder: 3,
     },
-  ]);
+  ]).onConflictDoNothing({ target: charities.slug });
 
   console.log("Charities seeded successfully");
 }

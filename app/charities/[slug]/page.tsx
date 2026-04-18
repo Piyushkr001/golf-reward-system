@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCharityBySlug } from "@/lib/charities";
 import { ArrowLeft, ExternalLink, HeartHandshake } from "lucide-react";
+import { getCurrentDbUser } from "@/lib/current-user";
 
 export default async function CharityDetailsPage({
   params,
@@ -12,6 +13,7 @@ export default async function CharityDetailsPage({
 }) {
   const { slug } = await params;
   const charity = await getCharityBySlug(slug);
+  const user = await getCurrentDbUser();
 
   if (!charity || !charity.isActive) {
     notFound();
@@ -56,11 +58,19 @@ export default async function CharityDetailsPage({
               <p className="mt-4 text-sm leading-7 text-slate-300 sm:text-base">{charity.fullDescription}</p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/sign-up">
-                  <Button className="h-11 rounded-2xl bg-linear-to-r from-violet-600 to-cyan-500 px-6 text-white">
-                    Support This Charity
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link href={user.role === "admin" ? "/admin" : "/dashboard"}>
+                    <Button className="h-11 rounded-2xl bg-linear-to-r from-violet-600 to-cyan-500 px-6 text-white">
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/sign-up">
+                    <Button className="h-11 rounded-2xl bg-linear-to-r from-violet-600 to-cyan-500 px-6 text-white">
+                      Support This Charity
+                    </Button>
+                  </Link>
+                )}
 
                 {charity.websiteUrl ? (
                   <a href={charity.websiteUrl} target="_blank" rel="noreferrer">
