@@ -3,6 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,24 +18,24 @@ function ResetPasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      return setError('Passwords do not match');
+      toast.error('Passwords do not match');
+      return;
     }
 
     setLoading(true);
-    setError('');
 
     try {
       await axios.post('/api/auth/reset-password', { token, password });
+      toast.success("Password has been successfully updated!");
       setSuccess(true);
       setTimeout(() => router.push('/sign-in'), 3000);
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Failed to reset password');
+      toast.error(err.response?.data?.error || err.message || 'Failed to reset password');
     } finally {
       setLoading(false);
     }
@@ -73,12 +74,6 @@ function ResetPasswordForm() {
           Please enter your new strong password below.
         </p>
       </div>
-
-      {error && (
-         <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium">
-           {error}
-         </div>
-      )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-2 relative">
