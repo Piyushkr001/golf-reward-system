@@ -26,7 +26,7 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [session, setSession] = useState<{ id: number, role: string, email: string } | null>(null);
+  const [session, setSession] = useState<{ userId: string, role: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

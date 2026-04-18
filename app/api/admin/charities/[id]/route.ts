@@ -21,12 +21,26 @@ export async function PATCH(
     const { id } = await params;
     const body = await req.json();
 
+    const name = String(body.name || "").trim();
+    const shortDescription = String(body.shortDescription || "").trim();
+    const fullDescription = String(body.fullDescription || "").trim();
+
+    if (name.length < 2) {
+      return NextResponse.json({ success: false, message: "Charity name is required" }, { status: 400 });
+    }
+    if (shortDescription.length < 10) {
+      return NextResponse.json({ success: false, message: "Short description is too short" }, { status: 400 });
+    }
+    if (fullDescription.length < 20) {
+      return NextResponse.json({ success: false, message: "Full description is too short" }, { status: 400 });
+    }
+
     await db
       .update(charities)
       .set({
-        name: body.name,
-        shortDescription: body.shortDescription,
-        fullDescription: body.fullDescription,
+        name,
+        shortDescription,
+        fullDescription,
         imageUrl: body.imageUrl || null,
         websiteUrl: body.websiteUrl || null,
         category: body.category,
