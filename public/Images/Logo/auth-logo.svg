@@ -1,0 +1,25 @@
+<svg width="860" height="220" viewBox="0 0 860 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="plGradient" x1="70" y1="20" x2="760" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="860" height="220" rx="32"/>
+
+  <!-- Icon -->
+  <rect x="34" y="34" width="152" height="152" rx="38" fill="#111827"/>
+  <circle cx="110" cy="110" r="44" stroke="url(#plGradient)" stroke-width="10"/>
+  <path d="M88 132L107 88L126 103L145 82" stroke="url(#plGradient)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="145" cy="82" r="7" fill="#22C55E"/>
+
+  <!-- Text -->
+  <text x="220" y="130" font-family="Inter, Poppins, Arial, sans-serif" font-size="72" font-weight="700" fill="#5144e2ff">
+    Play
+  </text>
+  <text x="373" y="130" font-family="Inter, Poppins, Arial, sans-serif" font-size="72" font-weight="800" fill="url(#plGradient)">
+    lance
+  </text>
+</svg>

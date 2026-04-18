@@ -1,8 +1,10 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import axios from "axios";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +25,23 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [session, setSession] = useState<{ id: number, role: string, email: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get('/api/auth/me')
+      .then(res => {
+        if (res.data?.authenticated) setSession(res.data.user);
+        else setSession(null);
+      })
+      .catch(() => setSession(null))
+      .finally(() => setLoading(false));
+  }, [pathname]);
+
+  const handleSignOut = async () => {
+    await axios.post('/api/auth/logout');
+    window.location.href = '/';
+  };
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -65,17 +84,42 @@ export default function Navbar() {
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
           <ModeToggle />
-          <Link href="/sign-in">
-            <Button variant="ghost" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
-              Sign In
-            </Button>
-          </Link>
+          
+          {!loading && !session ? (
+            <>
+              <Link href="/admin/login">
+                <Button variant="ghost" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4" />
+                  <span className="hidden lg:inline">Admin</span>
+                </Button>
+              </Link>
 
-          <Link href="/sign-up">
-            <Button className="bg-linear-to-r from-violet-600 to-cyan-500 text-white hover:opacity-90">
-              Get Started
-            </Button>
-          </Link>
+              <Link href="/sign-in">
+                <Button variant="ghost" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
+                  Sign In
+                </Button>
+              </Link>
+
+              <Link href="/sign-up">
+                <Button className="bg-linear-to-r from-violet-600 to-cyan-500 text-white hover:opacity-90">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          ) : !loading && session ? (
+            <>
+              <Button onClick={handleSignOut} variant="ghost" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
+                Sign Out
+              </Button>
+              <Link href={session.role === 'admin' ? '/dashboard/admin' : '/dashboard'}>
+                <Button className="bg-linear-to-r from-violet-600 to-cyan-500 text-white hover:opacity-90">
+                  Dashboard
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <div className="w-[180px] h-10 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
+          )}
         </div>
 
         {/* Mobile Menu */}
@@ -109,17 +153,43 @@ export default function Navbar() {
 
                 {/* CTA */}
                 <div className="flex flex-col gap-3 mt-6">
-                  <Link href="/sign-in">
-                    <Button variant="outline" className="w-full">
-                      Sign In
-                    </Button>
-                  </Link>
+                  
+                  {!loading && !session ? (
+                    <>
+                      <Link href="/admin/login">
+                        <Button variant="ghost" className="w-full flex items-center gap-2 justify-center border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+                          <ShieldCheck className="h-4 w-4" />
+                          Admin Login
+                        </Button>
+                      </Link>
 
-                  <Link href="/sign-up">
-                    <Button className="w-full bg-linear-to-r from-violet-600 to-cyan-500 text-white">
-                      Get Started
-                    </Button>
-                  </Link>
+                      <Link href="/sign-in">
+                        <Button variant="outline" className="w-full">
+                          Sign In
+                        </Button>
+                      </Link>
+
+                      <Link href="/sign-up">
+                        <Button className="w-full bg-linear-to-r from-violet-600 to-cyan-500 text-white">
+                          Get Started
+                        </Button>
+                      </Link>
+                    </>
+                  ) : !loading && session ? (
+                    <>
+                      <Link href={session.role === 'admin' ? '/dashboard/admin' : '/dashboard'}>
+                        <Button className="w-full bg-linear-to-r from-violet-600 to-cyan-500 text-white">
+                          Dashboard
+                        </Button>
+                      </Link>
+
+                      <Button onClick={handleSignOut} variant="outline" className="w-full text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/50">
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="w-full h-24 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                  )}
                 </div>
 
               </div>
