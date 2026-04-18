@@ -24,7 +24,7 @@ export default function AdminSignUpPage() {
 
     try {
       await axios.post('/api/auth/register', { email, password, role: 'admin' });
-      router.push('/dashboard/admin');
+      router.push('/onboarding/admin');
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || 'Registration failed');
     } finally {
