@@ -44,6 +44,7 @@ export async function POST(request: Request) {
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const [newUser] = await db.insert(users).values({
+      id: crypto.randomUUID(),
       email,
       passwordHash: hashedPassword,
       role: assignedRole,

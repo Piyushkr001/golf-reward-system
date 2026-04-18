@@ -3,6 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { db } from '@/config/db';
 import { users } from '@/config/schema';
 import { eq, count } from 'drizzle-orm';
+import crypto from 'crypto';
 import { createSession } from '@/lib/auth';
 
 const client = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
@@ -56,9 +57,11 @@ export async function POST(request: Request) {
       }
 
       [user] = await db.insert(users).values({
+        id: crypto.randomUUID(),
         email,
         googleId,
         role: assignedRole,
+        isVerified: true,
       }).returning();
     } else {
       // User exists. Enforce role boundary.

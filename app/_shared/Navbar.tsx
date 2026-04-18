@@ -111,9 +111,9 @@ export default function Navbar() {
               <Button onClick={handleSignOut} variant="ghost" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
                 Sign Out
               </Button>
-              <Link href={session.role === 'admin' ? '/dashboard/admin' : '/dashboard'}>
+              <Link href={session.role === 'admin' ? '/admin' : '/dashboard'}>
                 <Button className="bg-linear-to-r from-violet-600 to-cyan-500 text-white hover:opacity-90">
-                  Dashboard
+                  {session.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
                 </Button>
               </Link>
             </>
@@ -177,9 +177,9 @@ export default function Navbar() {
                     </>
                   ) : !loading && session ? (
                     <>
-                      <Link href={session.role === 'admin' ? '/dashboard/admin' : '/dashboard'}>
+                      <Link href={session.role === 'admin' ? '/admin' : '/dashboard'}>
                         <Button className="w-full bg-linear-to-r from-violet-600 to-cyan-500 text-white">
-                          Dashboard
+                          {session.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
                         </Button>
                       </Link>
 
