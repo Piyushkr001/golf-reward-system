@@ -63,8 +63,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Charity already exists" }, { status: 400 });
     }
 
+    const id = crypto.randomUUID();
+
     await db.insert(charities).values({
-      id: crypto.randomUUID(),
+      id,
       name,
       slug,
       shortDescription,
@@ -79,7 +81,21 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date(),
     });
 
-    return NextResponse.json({ success: true, message: "Charity created successfully" });
+    const newCharity = {
+      id,
+      name,
+      slug,
+      shortDescription,
+      fullDescription,
+      imageUrl: imageUrl || null,
+      websiteUrl: websiteUrl || null,
+      category,
+      featured,
+      isActive,
+      displayOrder,
+    };
+
+    return NextResponse.json({ success: true, message: "Charity created successfully", charity: newCharity });
   } catch (error) {
     console.error("Create charity error:", error);
     return NextResponse.json({ success: false, message: "Failed to create charity" }, { status: 500 });
