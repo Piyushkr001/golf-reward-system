@@ -36,6 +36,24 @@ export const charityCategoryEnum = pgEnum("charity_category", [
   "other",
 ]);
 
+export const subscriptionIntervalEnum = pgEnum("subscription_interval", [
+  "monthly",
+  "yearly",
+]);
+
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
+  "active",
+  "inactive",
+  "canceled",
+  "past_due",
+]);
+
+export const billingEventTypeEnum = pgEnum("billing_event_type", [
+  "charge",
+  "refund",
+  "invoice_created",
+]);
+
 
 export const users = pgTable(
   "users",
@@ -106,3 +124,49 @@ export const charities = pgTable(
     slugIdx: uniqueIndex("charities_slug_idx").on(table.slug),
   })
 );
+
+export const subscriptionPlans = pgTable(
+  "subscription_plans",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    interval: subscriptionIntervalEnum("interval").notNull(),
+    price: integer("price").notNull(), // using integer for cents or whole numbers
+    currency: text("currency").notNull().default("USD"),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    slugIdx: uniqueIndex("subscription_plans_slug_idx").on(table.slug),
+  })
+);
+
+export const subscriptions = pgTable("subscriptions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  planId: text("plan_id").notNull().references(() => subscriptionPlans.id),
+  status: subscriptionStatusEnum("status").notNull().default("inactive"),
+  provider: text("provider").notNull().default("internal"),
+  providerSubscriptionId: text("provider_subscription_id"),
+  startedAt: timestamp("started_at", { mode: "date" }).notNull(),
+  renewalDate: timestamp("renewal_date", { mode: "date" }),
+  canceledAt: timestamp("canceled_at", { mode: "date" }),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+});
+
+export const billingEvents = pgTable("billing_events", {
+  id: text("id").primaryKey(),
+  subscriptionId: text("subscription_id").notNull().references(() => subscriptions.id, {
+    onDelete: "cascade",
+  }),
+  eventType: billingEventTypeEnum("event_type").notNull(),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull().default("USD"),
+  providerEventId: text("provider_event_id"),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+});
