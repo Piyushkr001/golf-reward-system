@@ -12,16 +12,19 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+    console.log("Create Sub Payload:", body);
     const planSlug = String(body.planSlug || "").trim();
 
     const plan = await getPlanBySlug(planSlug);
     if (!plan) {
+      console.log("Invalid plan slug:", planSlug);
       return NextResponse.json({ success: false, message: "Invalid plan selected" }, { status: 400 });
     }
 
     const currentSub = await getUserSubscription(user.id);
     if (currentSub && currentSub.status === "active") {
-      return NextResponse.json({ success: false, message: "User already has an active subscription" }, { status: 400 });
+      // Return 200 so fetch() doesn't throw a browser console 400 error when handling duplicate requests gracefully
+      return NextResponse.json({ success: false, message: "User already has an active subscription" }, { status: 200 });
     }
 
     const subscriptionId = `sub_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
