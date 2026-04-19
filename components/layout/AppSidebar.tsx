@@ -7,7 +7,8 @@ import {
   CreditCard,
   Target,
   ShieldAlert,
-  HeartHandshake
+  HeartHandshake,
+  Gift
 } from "lucide-react";
 import {
   Sidebar,
@@ -39,6 +40,11 @@ const userRoutes = [
     url: "/dashboard/scores",
     icon: Target,
   },
+  {
+    title: "Draws",
+    url: "/dashboard/draws",
+    icon: Gift,
+  },
 ];
 
 const adminRoutes = [
@@ -51,6 +57,11 @@ const adminRoutes = [
     title: "Charities",
     url: "/admin/charities",
     icon: HeartHandshake,
+  },
+  {
+    title: "Draw Simulator",
+    url: "/admin/draws",
+    icon: Gift,
   },
 ];
 
