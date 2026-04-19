@@ -11,7 +11,7 @@ export default function WinningsPage() {
     <div className="space-y-6 mt-7 p-5">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Prize Validations</h1>
-        <p className="text-muted-foreground mt-1">Submit Proof files linking your PlayLance rewards securely to proceed with disbursements.</p>
+        <p className="text-muted-foreground mt-1">Submit proof of your active winnings to proceed with prize distribution securely.</p>
       </div>
 
       <WinningsManager />

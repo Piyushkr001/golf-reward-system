@@ -21,7 +21,7 @@ export function WinningsManager() {
       const res = await axios.get("/api/winnings");
       setWinnings(res.data.winnings || []);
     } catch (error) {
-      toast.error("Failed to fetch winning logic natively");
+      toast.error("Failed to load your winnings.");
     } finally {
       setLoading(false);
     }
@@ -39,11 +39,11 @@ export function WinningsManager() {
     setSubmittingId(winnerId);
     try {
       await axios.post(`/api/winnings/${winnerId}/proof`, { fileUrl: proofUrl });
-      toast.success("Validation payload successfully linked!");
+      toast.success("Proof submitted successfully!");
       setProofUrl("");
       await fetchData();
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Submission explicitly failed");
+      toast.error(err.response?.data?.error || "Failed to submit proof.");
     } finally {
       setSubmittingId(null);
     }
@@ -55,8 +55,8 @@ export function WinningsManager() {
     return (
       <div className="bg-card border border-border shadow-md rounded-2xl p-16 text-center">
          <Award className="h-16 w-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-         <h3 className="text-xl font-bold tracking-tight mb-2">No Verified Prizes Yet</h3>
-         <p className="text-muted-foreground">Continue linking scores natively to enter the global logic parameters physically!</p>
+         <h3 className="text-xl font-bold tracking-tight mb-2">No Winnings Yet</h3>
+         <p className="text-muted-foreground">Keep playing and entering monthly draws to see prizes appear here!</p>
       </div>
     );
   }
@@ -94,14 +94,14 @@ export function WinningsManager() {
                  {isPending || isRejected ? (
                    <>
                      <Button variant={isRejected ? "destructive" : "default"} className="w-full" onClick={() => setSubmittingId(`dialog-${win.id}`)}>
-                       {isRejected ? "Re-submit Validation Code" : "Submit Validation Payload"} <ArrowRight className="ml-2 h-4 w-4" />
+                       {isRejected ? "Re-submit Proof" : "Submit Proof"} <ArrowRight className="ml-2 h-4 w-4" />
                      </Button>
                      <Dialog open={submittingId === `dialog-${win.id}`} onOpenChange={(open) => !open && setSubmittingId(null)}>
                      <DialogContent>
                        <DialogHeader>
                          <DialogTitle>Submit Winning Proof Link</DialogTitle>
                          <DialogDescription>
-                           Provide a structural URL identically framing your verification metrics implicitly to administrators.
+                           Provide a secure URL to the proof of your winning submission.
                          </DialogDescription>
                        </DialogHeader>
                        <div className="py-4">
@@ -112,8 +112,8 @@ export function WinningsManager() {
                          />
                        </div>
                        <DialogFooter>
-                         <Button disabled={submittingId === win.id} onClick={() => handleSubmitProof(win.id)}>
-                           {submittingId === win.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <FileQuestion className="h-4 w-4 mr-2"/>} Push Integration 
+                         <Button disabled={submittingId === win.id || !proofUrl.trim()} onClick={() => handleSubmitProof(win.id)}>
+                           {submittingId === win.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <FileQuestion className="h-4 w-4 mr-2"/>} Submit Proof
                          </Button>
                        </DialogFooter>
                      </DialogContent>

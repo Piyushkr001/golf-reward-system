@@ -26,16 +26,17 @@ export async function POST(
       return NextResponse.json({ error: "Only simulated draws can be published" }, { status: 400 });
     }
 
-    await db.update(draws)
-      .set({
-        status: "published",
-        publishedAt: new Date(),
-        updatedAt: new Date()
-      })
-      .where(eq(draws.id, id));
+    await db.transaction(async (tx) => {
+      await tx.update(draws)
+        .set({
+          status: "published",
+          publishedAt: new Date(),
+          updatedAt: new Date()
+        })
+        .where(eq(draws.id, id));
 
-    // Hook logic: Calculate Winner boundaries automatically directly on publish trigger
-    await createWinnerRecordsForDraw(id);
+      await createWinnerRecordsForDraw(id, tx);
+    });
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {

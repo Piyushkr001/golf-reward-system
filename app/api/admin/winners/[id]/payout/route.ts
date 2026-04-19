@@ -19,12 +19,12 @@ export async function POST(
     const [winnerBlock] = await db.select().from(winners).where(eq(winners.id, id)).limit(1);
 
     if (!winnerBlock) {
-      return NextResponse.json({ error: "Winner mapping not found physically matching your bounds." }, { status: 404 });
+      return NextResponse.json({ error: "Winner record not found." }, { status: 404 });
     }
 
     // Check bounds! Admins cannot trigger paid statuses safely natively unless physically approved inside previous states
     if (winnerBlock.payoutStatus !== "approved_for_payment") {
-       return NextResponse.json({ error: "Validation constraints explicitly block mappings on pending loops." }, { status: 400 });
+       return NextResponse.json({ error: "Only approved items can be shifted to paid status." }, { status: 400 });
     }
 
     // Execute Native Mutation mapping absolute state
@@ -38,6 +38,6 @@ export async function POST(
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {
     console.error(`POST /api/admin/winners/${id}/payout error:`, error);
-    return NextResponse.json({ error: "Failed to persist validation boundaries natively" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to mark as paid." }, { status: 500 });
   }
 }
