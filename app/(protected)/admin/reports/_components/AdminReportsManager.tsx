@@ -79,8 +79,8 @@ export function AdminReportsManager() {
              <MetricsCard title="Total Winning Entries" value={summary.winners.total} icon={Award} description="Total lifetime winning users matched" />
              <MetricsCard title="Pending Validation Audits" value={summary.winners.pendingReviews} icon={Search} description="User submissions awaiting approval" />
              <MetricsCard title="Pending Prize Distributions" value={summary.winners.pendingPayouts} icon={ShieldCheck} description="Approved winners awaiting final payment" />
-             <MetricsCard title="Successfully Paid Out" value={summary.winners.paidPayouts} icon={Banknote} description="Distributions cleared natively" />
-             <MetricsCard title="Cumulative Value Given" value={`$${summary.winners.distributedPool.toLocaleString()}`} icon={Banknote} description="Raw metric calculating entire cash pool across active distributions." />
+             <MetricsCard title="Successfully Paid Out" value={summary.winners.paidPayouts} icon={Banknote} description="Total paid distributions" />
+             <MetricsCard title="Cumulative Value Given" value={`$${summary.winners.distributedPool.toLocaleString()}`} icon={Banknote} description="Total value distributed to winners" />
          </div>
       </div>
     </div>

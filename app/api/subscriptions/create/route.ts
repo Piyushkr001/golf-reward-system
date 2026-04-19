@@ -38,31 +38,33 @@ export async function POST(req: NextRequest) {
       renewalDate.setFullYear(renewalDate.getFullYear() + 1);
     }
 
-    // Insert mock subscription
-    await db.insert(subscriptions).values({
-      id: subscriptionId,
-      userId: user.id,
-      planId: plan.id,
-      status: "active",
-      provider: "internal",
-      providerSubscriptionId: `internal_sub_${Date.now()}`,
-      startedAt: now,
-      renewalDate,
-      createdAt: now,
-      updatedAt: now,
-    });
+    await db.transaction(async (tx) => {
+        // Insert mock subscription
+        await tx.insert(subscriptions).values({
+          id: subscriptionId,
+          userId: user.id,
+          planId: plan.id,
+          status: "active",
+          provider: "internal",
+          providerSubscriptionId: `internal_sub_${Date.now()}`,
+          startedAt: now,
+          renewalDate,
+          createdAt: now,
+          updatedAt: now,
+        });
 
-    const eventId = `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        const eventId = `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // Insert billing event
-    await db.insert(billingEvents).values({
-      id: eventId,
-      subscriptionId,
-      eventType: "charge",
-      amount: plan.price,
-      currency: plan.currency,
-      providerEventId: `internal_ch_${Date.now()}`,
-      createdAt: now,
+        // Insert billing event
+        await tx.insert(billingEvents).values({
+          id: eventId,
+          subscriptionId,
+          eventType: "charge",
+          amount: plan.price,
+          currency: plan.currency,
+          providerEventId: `internal_ch_${Date.now()}`,
+          createdAt: now,
+        });
     });
 
     return NextResponse.json({ success: true, message: "Subscription created" });

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Retrieve native layouts mapped exclusively isolating standard limits natively
+    // Fetch user's wins
     const genericWinners = await db.select()
        .from(winners)
        .where(eq(winners.userId, user.id))

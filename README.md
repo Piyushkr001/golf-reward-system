@@ -1,6 +1,6 @@
-# PlayLance
+# Playlance
 
-PlayLance is a robust, full-stack Next.js web application built with the App Router. It is designed to act as a hybrid charity contribution tracking and game-reward engine. Users can subscribe, participate in simulated monthly draws automatically tied to their charitable footprints, and manage their reward lifecycle intuitively.
+Playlance is a full-stack Next.js web application built with the App Router. It serves as a modern charity and rewards platform where users can subscribe, participate in monthly draws tied to their charitable contributions, and manage their reward lifecycle intuitively.
 
 ## 🚀 Tech Stack
 
@@ -8,108 +8,115 @@ PlayLance is a robust, full-stack Next.js web application built with the App Rou
 - **Language**: TypeScript
 - **Database**: PostgreSQL (via [Neon Database Serverless](https://neon.tech/))
 - **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
-- **Authentication**: Custom JWT Middleware (Edge-compatible verification)
-- **Styling**: Tailwind CSS + `shadcn/ui` + `framer-motion` for fluid component layouts
-- **Components**: `lucide-react`, `@radix-ui` generic models
+- **Authentication**: Custom JWT Middleware (Edge-compatible)
+- **Styling**: Tailwind CSS + `shadcn/ui`
+- **Components**: `lucide-react`, `@base-ui`
 
 ---
 
-## 🛠️ Core Modules Implemented
+## 🛠️ Implemented Modules
 
 ### 1. Authentication & Onboarding
-- JWT-based explicit authentication spanning strict middleware protections (e.g. users cannot access `/admin`).
-- Multi-step onboarding logic strictly separating standard users and administrators across roles.
+- JWT-based authentication with strict middleware protection for admin and user routes.
+- Multi-step onboarding flows explicitly separating user setup and administrator setup.
 
-### 2. Subscriptions & Billing Engine
-- Modular plan tracking capturing user monthly/yearly intervals organically formatting internal invoices seamlessly.
-- Allows admins to effectively track total system scale mapped natively.
+### 2. Subscriptions & Charities
+- Manages subscription statuses and tracking for monthly/yearly intervals.
+- Charity catalog allowing users to select and direct a percentage of their participation towards specific partners.
 
-### 3. Golf/Score Engine
-- Seamlessly allows users to log their internal scoring metrics across valid configurations dynamically formatting their validation histories securely.
+### 3. Golf Engine 
+- Score tracking allowing users to securely log and view historical scores.
 
 ### 4. Draw Lifecycle Simulator
-- Administrators can deploy automated simulated "Draws" containing matching algorithms parsing matching bounds against user entries.
-- Distributes internal arrays into logical pools allocating structural constraints explicitly formatting `5-match`, `4-match`, and `3-match` variables cleanly!
+- Automated monthly structured draws mapping matching algorithms against user entries.
+- Distributes the prize pool into logical tiers (5-match, 4-match, 3-match).
 
 ### 5. Winner Processing & Payout Queue
-- Seamlessly handles dynamic database aggregations natively verifying external proofs securely tracking payout phases (e.g., *Submitted* $\rightarrow$ *Approved* $\rightarrow$ *Paid*).
+- Verifies external proofs securely and tracks distinct payout phases (*Submitted* -> *Approved* -> *Paid*).
 
-### 6. Admin Analytics
-- Deep metrics visibility traversing Drizzle PostgreSQL dynamically serving realtime constraints (Active subs, Distributed Pools, Published Outcomes).
+### 6. Reports & Analytics
+- Administrative dashboard surfacing high-level statistics dynamically (Registered Users, Active Subscriptions, Total Charities, Distributed Prize Pools).
 
 ---
 
 ## 🏗️ Getting Started
 
 ### 1. Environment Variables
-Create a standard `.env` mapping the following internal boundaries natively:
+To run Playlance locally, copy the `.env.example` file to `.env` or create a new `.env` file containing the following keys:
 
 ```env
 # Database
-DRIZZLE_URL=postgresql://<user>:<password>@<host>/<database>?sslmode=require
+DATABASE_URL=postgresql://<user>:<password>@<host>/<database>?sslmode=require
 
 # Authentication
-JWT_SECRET=your_secure_randomly_generated_string
+JWT_SECRET=your_secure_jwt_secret
+
+# Google OAuth
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
+NEXT_PUBLIC_GOOGLE_SECRET=your_google_secret
+
+# SMTP (Mailing)
+SMTP_HOST=your_smtp_host
+SMTP_PORT=your_smtp_port
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_password
 
 # Standard Configurations
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### 2. Installation & Setup
-Make sure you have `bun` or `npm` strictly formatting local packages natively. 
+Install all dependencies using `bun`.
 
 ```bash
 bun install
 ```
 
 ### 3. Database Sync & Studio
-Apply the schema natively formatting external neon instances:
+Apply the schema design to your Neon PostgreSQL instance:
 
 ```bash
 bunx drizzle-kit push
 ```
 
-And to boot the local database viewer explicitly tracking iterations:
+To boot the local Drizzle Studio database viewer:
 
 ```bash
 bunx drizzle-kit studio
 ```
 
 ### 4. Boot Dev Environment
-Start the NextJS hot-reloading parameters correctly generating routes locally:
+Start the Next.js development server:
 
 ```bash
 bun run dev
 ```
 
-The system maps explicitly across `http://localhost:3000`.
+Your app will be available at `http://localhost:3000`.
 
 ---
 
 ## 📡 Route Overview
 
-### Universal Constraints
-- `/` - Marketing Landing Page securely framing generic platform hooks.
-- `/auth/sign-in` , `/auth/sign-up` - Explicit authentication sequences.
-- `/onboarding` - Gateway logic formatting DB hooks capturing roles seamlessly.
-
-### User Dashboard Shell 
-- `/dashboard` - Aggregate Summary (Winning aggregates, score histories).
-- `/dashboard/billing` - Subscription configuration loops.
-- `/dashboard/scores` - Interactive list formatting personal limits.
-- `/dashboard/draws` - Read-only view isolating monthly draw interactions.
-- `/dashboard/winnings` - Submission portal linking Verification validations manually!
+### User Facing
+- `/auth/sign-in` , `/auth/sign-up` - Authentication
+- `/onboarding` - Role-based setup
+- `/dashboard` - Summary of winnings, score counts, and subscription status.
+- `/dashboard/billing` - Subscription and billing management.
+- `/dashboard/scores` - Interactive personal score history.
+- `/dashboard/draws` - View monthly draw results.
+- `/dashboard/winnings` - Secure portal for submitting proof to claim prizes.
 
 ### Administrator Shell
 - `/admin` - Deep validation aggregates configuring internal bounds.
-- `/admin/charities` - Logic maintaining partner endpoints.
-- `/admin/draws` - Execution gateway simulating Draw outcomes and Prize loops!
-- `/admin/winners` - Review engine parsing Verification proofs structurally mapping paid logic safely.
-- `/admin/reports` - Real-time statistics capturing platform KPI integrity implicitly!
+- `/admin/charities` - Catalog management for charity partners.
+- `/admin/draws` - Execute monthly draws and preview simulated results.
+- `/admin/winners` - Review winners, approve proofs, and mark final payouts.
+- `/admin/reports` - Real-time business KPI overview.
 
 ---
 
-## 🔮 Future Improvements / Next Steps
-- Real-time provider webhooks hooking `Stripe` or external gateway providers.
-- Automated mailing limits tracking email notifications across active states.
-- System analytics parsing graph mapping trends natively over extensive loops explicitly. 
+## 🔮 Known Future Improvements
+- Refinements to payout provider integration (e.g. Stripe payouts).
+- Complete automated mailing sequences notifying users of state changes.
+- Complex analytics charting.

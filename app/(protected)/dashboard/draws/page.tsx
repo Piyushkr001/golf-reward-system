@@ -10,7 +10,7 @@ export default function DrawsPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Your Rewards & Draws</h2>
           <p className="text-muted-foreground max-w-2xl mt-2 text-sm leading-6">
-            If you are an active subscriber and have logged 5 valid scores safely onto the leaderboards, you securely enter the monthly draw matching automatically natively.
+            If you are an active subscriber and have logged 5 valid scores, you are automatically entered into the monthly draw.
           </p>
         </div>
         
