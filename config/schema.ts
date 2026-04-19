@@ -6,6 +6,7 @@ import {
   pgEnum,
   integer,
   uniqueIndex,
+  date,
 } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
@@ -170,3 +171,20 @@ export const billingEvents = pgTable("billing_events", {
   providerEventId: text("provider_event_id"),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
+
+export const golfScores = pgTable(
+  "golf_scores",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    score: integer("score").notNull(),
+    scoreDate: date("score_date", { mode: "string" }).notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userDateUniqueIdx: uniqueIndex("golf_scores_user_date_idx").on(table.userId, table.scoreDate),
+  })
+);
