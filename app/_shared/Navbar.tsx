@@ -57,6 +57,10 @@ export default function Navbar() {
     return pathname.startsWith(href);
   };
 
+  if (pathname?.startsWith("/dashboard") || pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <header className="sticky rounded-2xl shadow-xl top-0 z-50 w-full border-b border-slate-200 dark:border-white/10 bg-white/70 bg-linear-to-r from-violet-50/50 to-cyan-50/50 dark:bg-slate-950/70 dark:bg-none backdrop-blur-xl">
       <div className="mx-auto h-20 flex max-w-7xl items-center justify-between px-6 py-4">

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { ProtectedShell } from "@/components/layout/ProtectedShell";
 
-export default function DashboardProtractorLayout({
+export default function AdminLayout({
   children,
 }: {
   children: ReactNode;

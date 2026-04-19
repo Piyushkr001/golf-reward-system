@@ -71,24 +71,24 @@ export function CharityCardEditor({ charity, onUpdateParams, onDeactivate }: Cha
     };
 
     return (
-        <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-5">
+        <div className="rounded-3xl border border-border bg-card/60 backdrop-blur-md p-5 shadow-sm">
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="grid gap-2">
                     <Label>Name</Label>
                     <Input
                         value={draft.name}
                         onChange={(e) => setDraft((prev) => ({ ...prev, name: e.target.value }))}
-                        className="border-white/10 bg-slate-950/70 text-white"
+                        className="bg-background"
                     />
                 </div>
                 
                 <div className="grid gap-2">
                     <Label>Category</Label>
                     <Select value={draft.category} onValueChange={(value) => setDraft(prev => ({ ...prev, category: value || "other" }))}>
-                        <SelectTrigger className="border-white/10 bg-slate-950/70 text-white">
+                        <SelectTrigger className="bg-background">
                             <SelectValue placeholder="Select category" />
                         </SelectTrigger>
-                        <SelectContent className="bg-slate-900 border-white/10 text-white">
+                        <SelectContent className="bg-popover text-popover-foreground">
                             <SelectItem value="education">Education</SelectItem>
                             <SelectItem value="sports">Sports</SelectItem>
                             <SelectItem value="health">Health</SelectItem>
@@ -104,7 +104,7 @@ export function CharityCardEditor({ charity, onUpdateParams, onDeactivate }: Cha
                     <Textarea
                         value={draft.shortDescription}
                         onChange={(e) => setDraft((prev) => ({ ...prev, shortDescription: e.target.value }))}
-                        className="border-white/10 bg-slate-950/70 text-white"
+                        className="bg-background"
                     />
                 </div>
                 
@@ -113,7 +113,7 @@ export function CharityCardEditor({ charity, onUpdateParams, onDeactivate }: Cha
                     <Textarea
                         value={draft.fullDescription}
                         onChange={(e) => setDraft((prev) => ({ ...prev, fullDescription: e.target.value }))}
-                        className="min-h-28 border-white/10 bg-slate-950/70 text-white"
+                        className="min-h-28 bg-background"
                     />
                 </div>
                 
@@ -122,7 +122,7 @@ export function CharityCardEditor({ charity, onUpdateParams, onDeactivate }: Cha
                     <Input
                         value={draft.imageUrl || ""}
                         onChange={(e) => setDraft((prev) => ({ ...prev, imageUrl: e.target.value }))}
-                        className="border-white/10 bg-slate-950/70 text-white"
+                        className="bg-background"
                     />
                 </div>
                 
@@ -131,7 +131,7 @@ export function CharityCardEditor({ charity, onUpdateParams, onDeactivate }: Cha
                     <Input
                         value={draft.websiteUrl || ""}
                         onChange={(e) => setDraft((prev) => ({ ...prev, websiteUrl: e.target.value }))}
-                        className="border-white/10 bg-slate-950/70 text-white"
+                        className="bg-background"
                     />
                 </div>
             </div>
@@ -143,7 +143,7 @@ export function CharityCardEditor({ charity, onUpdateParams, onDeactivate }: Cha
                             checked={draft.featured}
                             onCheckedChange={(checked) => setDraft((prev) => ({ ...prev, featured: checked }))}
                         />
-                        <span className="text-sm text-slate-200">Featured</span>
+                        <span className="text-sm text-foreground">Featured</span>
                     </div>
                     
                     <div className="flex items-center gap-3">
@@ -151,7 +151,7 @@ export function CharityCardEditor({ charity, onUpdateParams, onDeactivate }: Cha
                             checked={draft.isActive}
                             onCheckedChange={(checked) => setDraft((prev) => ({ ...prev, isActive: checked }))}
                         />
-                        <span className="text-sm text-slate-200">Active</span>
+                        <span className="text-sm text-foreground">Active</span>
                     </div>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
