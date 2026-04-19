@@ -31,7 +31,7 @@ export async function PATCH(
     console.error(`PATCH /api/scores/${id} error:`, error);
     
     // Catch duplication violation when updating to a conflicting date
-    if (error.code === "23505") {
+    if (error.code === "23505" || error.cause?.code === "23505" || error.message?.includes("duplicate key")) {
         return NextResponse.json({ error: "Another score for this date already exists." }, { status: 400 });
     }
 

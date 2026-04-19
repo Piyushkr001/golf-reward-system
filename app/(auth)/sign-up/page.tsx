@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
@@ -18,6 +18,17 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    axios.get('/api/auth/me')
+      .then((res) => {
+         if (res.data?.user) {
+            toast.success("You are already signed in");
+            router.replace(res.data.user.role === 'admin' ? '/admin' : '/dashboard');
+         }
+      })
+      .catch(() => {});
+  }, [router]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();

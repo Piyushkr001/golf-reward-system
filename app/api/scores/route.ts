@@ -39,13 +39,13 @@ export async function POST(req: NextRequest) {
     const newScore = await createUserScore(user.id, score, scoreDate);
     return NextResponse.json({ score: newScore }, { status: 201 });
   } catch (error: any) {
-    console.error("POST /api/scores error:", error);
-
-    // Postgres unique constraint violation is classically 23505
-    if (error.code === "23505") {
+    // Postgres unique constraint violation is classically 23505, but Neon wraps it in cause
+    if (error.code === "23505" || error.cause?.code === "23505" || error.message?.includes("duplicate key")) {
       return NextResponse.json({ error: "A score for this date already exists." }, { status: 400 });
     }
 
+    // Only log actual unexpected failures
+    console.error("POST /api/scores error:", error);
     return NextResponse.json({ error: error.message || "Failed to create score" }, { status: 500 });
   }
 }

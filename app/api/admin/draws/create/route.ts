@@ -32,6 +32,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ draw: newDraw }, { status: 201 });
   } catch (error: any) {
+    if (error.code === "23505" || error.cause?.code === "23505" || error.message?.includes("duplicate key")) {
+      return NextResponse.json({ error: "A draw iteration for this Month and Year already exists." }, { status: 400 });
+    }
     console.error("POST /api/admin/draws/create error:", error);
     return NextResponse.json({ error: "Failed to create draft draw" }, { status: 500 });
   }

@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Loader2, Award, AlertCircle, Calendar } from "lucide-react";
 
+import { DrawRecord, DrawEntryResult } from "@/types/draws";
+
 export function UserDrawView() {
-  const [latestDraw, setLatestDraw] = useState<any>(null);
-  const [myEntries, setMyEntries] = useState<any[]>([]);
+  const [latestDraw, setLatestDraw] = useState<DrawRecord | null>(null);
+  const [myEntries, setMyEntries] = useState<DrawEntryResult[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,7 +46,9 @@ export function UserDrawView() {
             <h3 className="text-xl font-bold tracking-tight mb-1">
               {new Date(0, latestDraw.month - 1).toLocaleString('default', { month: 'long' })} {latestDraw.year} Draw
             </h3>
-            <p className="text-muted-foreground text-sm mb-6">Results published on {new Date(latestDraw.publishedAt).toLocaleDateString()}</p>
+            {latestDraw.publishedAt && (
+              <p className="text-muted-foreground text-sm mb-6">Results published on {new Date(latestDraw.publishedAt).toLocaleDateString()}</p>
+            )}
             
             <div className="mb-6">
               <p className="text-sm font-semibold uppercase text-muted-foreground mb-3 tracking-wider">Winning Numbers</p>
@@ -79,7 +83,7 @@ export function UserDrawView() {
                     })}
                    </div>
                    <p className="text-sm">
-                     You matched <strong className="text-amber-500 text-lg">{currentEntry.matchCount}</strong> {currentEntry.matchCount === 1 ? 'number' : 'numbers'}.
+                     You matched <strong className="text-amber-500 text-lg">{currentEntry.matchCount}</strong> out of <strong className="text-amber-500 text-lg">5</strong> numbers.
                      {currentEntry.isWinner 
                         ? " Congratulations! You placed in the prize pool!" 
                         : " Better luck next time. Keep logging scores to be eligible!"}

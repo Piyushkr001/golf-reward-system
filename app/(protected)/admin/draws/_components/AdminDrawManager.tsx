@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+import { DrawRecord } from "@/types/draws";
+
 export function AdminDrawManager() {
-  const [draws, setDraws] = useState<any[]>([]);
+  const [draws, setDraws] = useState<DrawRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [simulating, setSimulating] = useState<string | null>(null);
@@ -127,9 +129,21 @@ export function AdminDrawManager() {
                 <span className="text-xs text-muted-foreground uppercase">{d.logicType}</span>
               </div>
               <p className="text-sm text-foreground mb-1">
-                Participants: <span className="font-bold">{d.participantCount || 0}</span>
-                {d.prizePool && ` | Total Prize: $${d.prizePool.totalPool}`}
+                Participants: <span className="font-bold mr-2">{d.participantCount || 0}</span>
+                {d.prizePool && (
+                  <span className="text-muted-foreground mr-2">| Total Pool: <span className="font-bold text-foreground">${d.prizePool.totalPool}</span></span>
+                )}
               </p>
+              
+              {/* Winner Stats breakdown automatically computed server-side */}
+              {d.status !== "draft" && d.winnerCounts && (
+                 <div className="flex gap-4 mt-1 text-sm bg-muted/30 px-3 py-2 rounded-lg border border-border">
+                    <div><span className="text-green-500 font-bold">5 Matches</span>: {d.winnerCounts.five}</div>
+                    <div><span className="text-amber-500 font-bold">4 Matches</span>: {d.winnerCounts.four}</div>
+                    <div><span className="text-blue-500 font-bold">3 Matches</span>: {d.winnerCounts.three}</div>
+                    {d.rolloverAmount > 0 && <div className="ml-auto flex items-center font-bold text-violet-500">Rollover: ${d.rolloverAmount}</div>}
+                 </div>
+              )}
               {d.winningNumbers && (
                 <div className="flex gap-2 mt-3">
                   {d.winningNumbers.map((n: number, i: number) => (
