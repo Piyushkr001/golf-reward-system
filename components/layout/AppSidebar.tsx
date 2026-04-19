@@ -9,7 +9,8 @@ import {
   ShieldAlert,
   HeartHandshake,
   Gift,
-  Award
+  Award,
+  LineChart
 } from "lucide-react";
 import {
   Sidebar,
@@ -73,6 +74,11 @@ const adminRoutes = [
     title: "Winners & Payouts",
     url: "/admin/winners",
     icon: Award,
+  },
+  {
+    title: "Reports & Analytics",
+    url: "/admin/reports",
+    icon: LineChart,
   },
 ];
 
