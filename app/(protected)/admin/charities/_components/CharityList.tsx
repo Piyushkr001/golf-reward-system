@@ -10,7 +10,7 @@ interface CharityListProps {
 export function CharityList({ charities, onUpdateCharity, onDeactivateCharity }: CharityListProps) {
     if (!charities || charities.length === 0) {
         return (
-            <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-10 mt-6 text-center text-slate-400">
+            <div className="rounded-3xl border border-border bg-card/60 backdrop-blur-md p-10 mt-6 text-center text-muted-foreground shadow-sm">
                 <p>No charities found. Start by creating a new one above!</p>
             </div>
         );

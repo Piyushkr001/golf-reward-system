@@ -3,11 +3,21 @@ import Link from 'next/link';
 import { Trophy } from "lucide-react";
 import Image from "next/image";
 
-export default function AuthLayout({
+import { cookies } from "next/headers";
+import ClientAuthRedirect from "./ClientAuthRedirect";
+
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Catch authenticated users traversing to public auth gates
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("session")?.value;
+
+  if (sessionToken) {
+    return <ClientAuthRedirect />;
+  }
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-slate-50 dark:bg-slate-950">
       

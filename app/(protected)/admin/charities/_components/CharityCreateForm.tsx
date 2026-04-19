@@ -71,25 +71,25 @@ export function CharityCreateForm({ onCreated }: CharityCreateFormProps) {
     };
 
     return (
-        <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+        <div className="rounded-3xl border border-border bg-card/60 backdrop-blur-md p-6 shadow-sm">
             <div className="mb-6 flex items-center gap-3">
-                <PlusCircle className="h-5 w-5 text-cyan-300" />
-                <h2 className="text-xl font-semibold text-white">Create New Charity</h2>
+                <PlusCircle className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-semibold text-foreground">Create New Charity</h2>
             </div>
             
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="grid gap-2">
                     <Label>Name</Label>
-                    <Input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} className="border-white/10 bg-slate-950/70 text-white" />
+                    <Input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} className="bg-background" />
                 </div>
                 
                 <div className="grid gap-2">
                     <Label>Category</Label>
                     <Select value={form.category} onValueChange={(value) => setForm(prev => ({ ...prev, category: value || "other" }))}>
-                        <SelectTrigger className="border-white/10 bg-slate-950/70 text-white">
+                        <SelectTrigger className="bg-background">
                             <SelectValue placeholder="Select category" />
                         </SelectTrigger>
-                        <SelectContent className="bg-slate-900 border-white/10 text-white">
+                        <SelectContent className="bg-popover text-popover-foreground">
                             <SelectItem value="education">Education</SelectItem>
                             <SelectItem value="sports">Sports</SelectItem>
                             <SelectItem value="health">Health</SelectItem>
@@ -102,37 +102,37 @@ export function CharityCreateForm({ onCreated }: CharityCreateFormProps) {
                 
                 <div className="grid gap-2 md:col-span-2">
                     <Label>Short Description</Label>
-                    <Textarea value={form.shortDescription} onChange={(e) => setForm((prev) => ({ ...prev, shortDescription: e.target.value }))} className="border-white/10 bg-slate-950/70 text-white" />
+                    <Textarea value={form.shortDescription} onChange={(e) => setForm((prev) => ({ ...prev, shortDescription: e.target.value }))} className="bg-background" />
                 </div>
 
                 <div className="grid gap-2 md:col-span-2">
                     <Label>Full Description</Label>
-                    <Textarea value={form.fullDescription} onChange={(e) => setForm((prev) => ({ ...prev, fullDescription: e.target.value }))} className="min-h-32 border-white/10 bg-slate-950/70 text-white" />
+                    <Textarea value={form.fullDescription} onChange={(e) => setForm((prev) => ({ ...prev, fullDescription: e.target.value }))} className="min-h-32 bg-background" />
                 </div>
                 
                 <div className="grid gap-2">
                     <Label>Image URL</Label>
-                    <Input value={form.imageUrl} onChange={(e) => setForm((prev) => ({ ...prev, imageUrl: e.target.value }))} className="border-white/10 bg-slate-950/70 text-white" />
+                    <Input value={form.imageUrl} onChange={(e) => setForm((prev) => ({ ...prev, imageUrl: e.target.value }))} className="bg-background" />
                 </div>
                 
                 <div className="grid gap-2">
                     <Label>Website URL</Label>
-                    <Input value={form.websiteUrl} onChange={(e) => setForm((prev) => ({ ...prev, websiteUrl: e.target.value }))} className="border-white/10 bg-slate-950/70 text-white" />
+                    <Input value={form.websiteUrl} onChange={(e) => setForm((prev) => ({ ...prev, websiteUrl: e.target.value }))} className="bg-background" />
                 </div>
                 
                 <div className="grid gap-2">
                     <Label>Display Order</Label>
-                    <Input type="number" value={form.displayOrder} onChange={(e) => setForm((prev) => ({ ...prev, displayOrder: Number(e.target.value) }))} className="border-white/10 bg-slate-950/70 text-white" />
+                    <Input type="number" value={form.displayOrder} onChange={(e) => setForm((prev) => ({ ...prev, displayOrder: Number(e.target.value) }))} className="bg-background" />
                 </div>
                 
                 <div className="flex items-center gap-8 pt-7">
                     <div className="flex items-center gap-3">
                         <Switch checked={form.featured} onCheckedChange={(checked) => setForm((prev) => ({ ...prev, featured: checked }))} />
-                        <span className="text-sm text-slate-200">Featured</span>
+                        <span className="text-sm text-foreground">Featured</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <Switch checked={form.isActive} onCheckedChange={(checked) => setForm((prev) => ({ ...prev, isActive: checked }))} />
-                        <span className="text-sm text-slate-200">Active</span>
+                        <span className="text-sm text-foreground">Active</span>
                     </div>
                 </div>
             </div>

@@ -2,11 +2,18 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InstagramLogoIcon, LinkedinLogoIcon, XLogoIcon } from '@phosphor-icons/react';
 
 export default function Footer() {
+  const pathname = usePathname();
+  
+  if (pathname?.startsWith("/dashboard") || pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <footer className="w-full border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/70 pt-16 pb-8">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
