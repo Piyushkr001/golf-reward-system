@@ -7,6 +7,7 @@ import {
   integer,
   uniqueIndex,
   date,
+  json,
 } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
@@ -188,3 +189,46 @@ export const golfScores = pgTable(
     userDateUniqueIdx: uniqueIndex("golf_scores_user_date_idx").on(table.userId, table.scoreDate),
   })
 );
+
+export const drawLogicTypeEnum = pgEnum("draw_logic_type", ["random", "algorithmic"]);
+export const drawStatusEnum = pgEnum("draw_status", ["draft", "simulated", "published"]);
+
+export const draws = pgTable("draws", {
+  id: text("id").primaryKey(),
+  month: integer("month").notNull(),
+  year: integer("year").notNull(),
+  logicType: drawLogicTypeEnum("logic_type").notNull(),
+  status: drawStatusEnum("status").notNull().default("draft"),
+  winningNumbers: json("winning_numbers").$type<number[]>(),
+  rolloverAmount: integer("rollover_amount").notNull().default(0),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+  publishedAt: timestamp("published_at", { mode: "date" }),
+});
+
+export const drawEntries = pgTable("draw_entries", {
+  id: text("id").primaryKey(),
+  drawId: text("draw_id").notNull().references(() => draws.id, {
+    onDelete: "cascade",
+  }),
+  userId: text("user_id").notNull().references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  entryNumbers: json("entry_numbers").$type<number[]>().notNull(),
+  matchCount: integer("match_count"),
+  isWinner: boolean("is_winner").notNull().default(false),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+});
+
+export const prizePools = pgTable("prize_pools", {
+  id: text("id").primaryKey(),
+  drawId: text("draw_id").notNull().references(() => draws.id, {
+    onDelete: "cascade",
+  }),
+  totalPool: integer("total_pool").notNull().default(0),
+  fiveMatchPool: integer("five_match_pool").notNull().default(0),
+  fourMatchPool: integer("four_match_pool").notNull().default(0),
+  threeMatchPool: integer("three_match_pool").notNull().default(0),
+  rolloverIntoNext: integer("rollover_into_next").notNull().default(0),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+});

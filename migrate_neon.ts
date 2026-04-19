@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const sqlScript = fs.readFileSync("./drizzle/0001_deep_monster_badoon.sql", "utf-8");
+const sqlScript = fs.readFileSync("./drizzle/0000_past_ronan.sql", "utf-8");
 const statements = sqlScript.split("--> statement-breakpoint");
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
