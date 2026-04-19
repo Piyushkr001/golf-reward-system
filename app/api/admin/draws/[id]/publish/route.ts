@@ -3,6 +3,7 @@ import { getCurrentDbUser } from "@/lib/current-user";
 import { db } from "@/config/db";
 import { draws } from "@/config/schema";
 import { eq } from "drizzle-orm";
+import { createWinnerRecordsForDraw } from "@/lib/winners";
 
 export async function POST(
   req: NextRequest,
@@ -32,6 +33,9 @@ export async function POST(
         updatedAt: new Date()
       })
       .where(eq(draws.id, id));
+
+    // Hook logic: Calculate Winner boundaries automatically directly on publish trigger
+    await createWinnerRecordsForDraw(id);
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {

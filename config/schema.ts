@@ -244,3 +244,37 @@ export const prizePools = pgTable("prize_pools", {
   rolloverIntoNext: integer("rollover_into_next").notNull().default(0),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
+
+export const winnerTierEnum = pgEnum("winner_tier", ["5-match", "4-match", "3-match"]);
+export const reviewStatusEnum = pgEnum("review_status", ["not_submitted", "submitted", "approved", "rejected"]);
+export const payoutStatusEnum = pgEnum("payout_status", ["pending", "approved_for_payment", "paid"]);
+
+export const winners = pgTable(
+  "winners",
+  {
+    id: text("id").primaryKey(),
+    drawId: text("draw_id").notNull().references(() => draws.id, { onDelete: "cascade" }),
+    drawEntryId: text("draw_entry_id").notNull().references(() => drawEntries.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    tier: winnerTierEnum("tier").notNull(),
+    prizeAmount: integer("prize_amount").notNull().default(0),
+    reviewStatus: reviewStatusEnum("review_status").notNull().default("not_submitted"),
+    payoutStatus: payoutStatusEnum("payout_status").notNull().default("pending"),
+    rejectionReason: text("rejection_reason"),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    drawEntryIdx: uniqueIndex("winners_draw_entry_idx").on(table.drawEntryId),
+  })
+);
+
+export const winnerProofs = pgTable("winner_proofs", {
+  id: text("id").primaryKey(),
+  winnerId: text("winner_id").notNull().references(() => winners.id, { onDelete: "cascade" }),
+  fileUrl: text("file_url").notNull(),
+  fileName: text("file_name"),
+  mimeType: text("mime_type"),
+  submittedAt: timestamp("submitted_at", { mode: "date" }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+});
