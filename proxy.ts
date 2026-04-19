@@ -14,7 +14,7 @@ const protectedRoutes = ['/dashboard', '/admin'];
 const userDashboardRoute = '/dashboard';
 const adminDashboardRoute = '/admin';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   if (pathname.startsWith('/admin/login') || pathname.startsWith('/admin/sign-up') || pathname.startsWith('/api/auth/')) {

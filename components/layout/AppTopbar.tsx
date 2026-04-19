@@ -5,8 +5,9 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/Modetoggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LogOut } from "lucide-react";
+import { Home, LogOut } from "lucide-react";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface AppTopbarProps {
   role: "user" | "admin" | string;
@@ -56,6 +57,10 @@ export function AppTopbar({ role }: AppTopbarProps) {
         <Badge variant="outline" className="hidden sm:inline-flex capitalize">
           {role}
         </Badge>
+        <Link href="/">
+          <Home className="h-4 w-4 text-muted-foreground" />
+          <span className="sr-only">Home</span>
+        </Link>
         <ModeToggle />
         <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
           <LogOut className="h-4 w-4 text-muted-foreground" />

@@ -10,7 +10,9 @@ import {
   HeartHandshake,
   Gift,
   Award,
-  LineChart
+  LineChart,
+  User,
+  Users
 } from "lucide-react";
 import {
   Sidebar,
@@ -52,6 +54,11 @@ const userRoutes = [
     url: "/dashboard/winnings",
     icon: Award,
   },
+  {
+    title: "Profile",
+    url: "/dashboard/profile",
+    icon: User,
+  },
 ];
 
 const adminRoutes = [
@@ -80,6 +87,16 @@ const adminRoutes = [
     url: "/admin/reports",
     icon: LineChart,
   },
+  {
+    title: "Manage Users",
+    url: "/admin/users",
+    icon: Users,
+  },
+  {
+    title: "Profile Settings",
+    url: "/admin/profile",
+    icon: User,
+  },
 ];
 
 interface AppSidebarProps {
@@ -99,14 +116,12 @@ export function AppSidebar({ role }: AppSidebarProps) {
   return (
     <Sidebar variant="inset">
       <SidebarHeader className="p-4 flex flex-row items-center justify-between border-b border-sidebar-border">
-        <Link href="/">
         <Image src="/Images/Logo/logo.svg" alt="PlayLance"
             width={160}
             height={48}
             className="dark:invert w-auto h-18"
             priority
             />
-        </Link>
       </SidebarHeader>
       
       <SidebarContent>
