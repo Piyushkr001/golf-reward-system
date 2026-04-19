@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     const { email, sub: googleId } = payload;
-    let assignedRole = role === 'admin' ? 'admin' : 'user';
+    const assignedRole: "admin" | "user" = role === 'admin' ? 'admin' : 'user';
 
     if (assignedRole === 'admin' && !email.endsWith('@playlance.com')) {
       return NextResponse.json({ error: 'Admin access requires a @playlance.com Google account.' }, { status: 403 });

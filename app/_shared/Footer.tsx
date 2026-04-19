@@ -62,6 +62,7 @@ export default function Footer() {
               <Link href="/privacy-policy" className="text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">Privacy Policy</Link>
               <Link href="/terms-of-service" className="text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">Terms of Service</Link>
               <Link href="/cookie-policy" className="text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">Cookie Policy</Link>
+              <Link href="/contact" className="text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">Contact Us</Link>
             </div>
 
             {/* CTA App */}
