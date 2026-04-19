@@ -2,20 +2,22 @@ import { db } from "@/config/db";
 import { draws, drawEntries, prizePools, winners } from "@/config/schema";
 import { eq } from "drizzle-orm";
 
-export async function createWinnerRecordsForDraw(drawId: string) {
+export async function createWinnerRecordsForDraw(drawId: string, tx?: any) {
+  const dbConn = tx || db;
+
   // 1. Fetch source constraints mapped explicitly
-  const [draw] = await db.select().from(draws).where(eq(draws.id, drawId)).limit(1);
+  const [draw] = await dbConn.select().from(draws).where(eq(draws.id, drawId)).limit(1);
   if (!draw) throw new Error("Draw not securely found");
 
-  const [pool] = await db.select().from(prizePools).where(eq(prizePools.drawId, drawId)).limit(1);
-  if (!pool) throw new Error("Prize tracking pool missing from target map");
+  const [pool] = await dbConn.select().from(prizePools).where(eq(prizePools.drawId, drawId)).limit(1);
+  if (!pool) throw new Error("Prize pool missing for target draw");
 
-  const entries = await db.select().from(drawEntries).where(eq(drawEntries.drawId, drawId));
+  const entries = await dbConn.select().from(drawEntries).where(eq(drawEntries.drawId, drawId));
 
   // Identify mathematical array lengths
-  const match5Entries = entries.filter(e => e.matchCount === 5);
-  const match4Entries = entries.filter(e => e.matchCount === 4);
-  const match3Entries = entries.filter(e => e.matchCount === 3);
+  const match5Entries = entries.filter((e: { matchCount: number; }) => e.matchCount === 5);
+  const match4Entries = entries.filter((e: { matchCount: number; }) => e.matchCount === 4);
+  const match3Entries = entries.filter((e: { matchCount: number; }) => e.matchCount === 3);
 
   // Divide raw totals seamlessly formatting boundaries dynamically ignoring overlaps
   const getPayoutAmount = (count: number, rawPool: number) => {
@@ -28,7 +30,7 @@ export async function createWinnerRecordsForDraw(drawId: string) {
   const payout3Match = getPayoutAmount(match3Entries.length, pool.threeMatchPool);
 
   // Safely erase previously configured iterations handling duplicate publish triggers
-  await db.delete(winners).where(eq(winners.drawId, drawId));
+  await dbConn.delete(winners).where(eq(winners.drawId, drawId));
 
   const insertQueue: {
       id: string,
@@ -62,7 +64,7 @@ export async function createWinnerRecordsForDraw(drawId: string) {
 
   // Push cleanly into Schema if elements exist!
   if (insertQueue.length > 0) {
-      await db.insert(winners).values(insertQueue);
+      await dbConn.insert(winners).values(insertQueue);
   }
 
   return { success: true, count: insertQueue.length };

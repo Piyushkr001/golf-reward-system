@@ -23,7 +23,7 @@ export function AdminWinnersManager() {
       const res = await axios.get("/api/admin/winners");
       setWinners(res.data.winners || []);
     } catch (error) {
-      toast.error("Failed to map distributions natively");
+      toast.error("Failed to load winners.");
     } finally {
       setLoading(false);
     }
@@ -35,19 +35,19 @@ export function AdminWinnersManager() {
 
   const handleReview = async (winnerId: string, status: "approved" | "rejected") => {
     if (status === "rejected" && !rejectionReason.trim()) {
-      toast.error("You exactly must explicitly define contextual metrics explaining this logic");
+      toast.error("Please provide a rejection reason.");
       return;
     }
     
     setProcessingId(winnerId);
     try {
       await axios.post(`/api/admin/winners/${winnerId}/review`, { status, reason: status === "rejected" ? rejectionReason : null });
-      toast.success(`Proof validation properly ${status} securely!`);
+      toast.success(status === "approved" ? "Proof approved successfully." : "Proof rejected.");
       if (status === "rejected") setRejectingId(null);
       setRejectionReason("");
       await fetchData();
     } catch (err: any) {
-      toast.error(err.response?.data?.error || `Failed isolating boundaries`);
+      toast.error(err.response?.data?.error || `Failed to process review.`);
     } finally {
       setProcessingId(null);
     }
@@ -57,10 +57,10 @@ export function AdminWinnersManager() {
     setProcessingId(`payout-${winnerId}`);
     try {
       await axios.post(`/api/admin/winners/${winnerId}/payout`);
-      toast.success("Payout transition mechanically mapped to Paid!");
+      toast.success("Payout marked as paid.");
       await fetchData();
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Error distributing arrays natively");
+      toast.error(err.response?.data?.error || "Error distributing payout.");
     } finally {
       setProcessingId(null);
     }
@@ -73,7 +73,7 @@ export function AdminWinnersManager() {
       <div className="bg-card border border-border shadow-md rounded-2xl p-16 text-center">
          <Award className="h-16 w-16 mx-auto text-muted-foreground mb-4 opacity-50" />
          <h3 className="text-xl font-bold tracking-tight mb-2">No Winners Processed</h3>
-         <p className="text-muted-foreground">Publish simulated maps logically triggering tracking.</p>
+         <p className="text-muted-foreground">Publish simulated draws to track winners here.</p>
       </div>
     );
   }
@@ -95,7 +95,7 @@ export function AdminWinnersManager() {
                  </div>
                  
                  <p className="text-sm text-muted-foreground break-all">
-                    User mapping strictly: <strong className="text-foreground">{win.user?.email || win.userId}</strong>
+                    User: <strong className="text-foreground">{win.user?.email || win.userId}</strong>
                  </p>
                  
                  <div className="flex flex-col gap-1 mt-2">
@@ -116,9 +116,9 @@ export function AdminWinnersManager() {
 
               {/* Action Handlers explicitly wrapping native UI components */}
               <div className="flex flex-col gap-3 min-w-[200px] w-full md:w-auto">
-                 {win.proof?.fileUrl && (
+                  {win.proof?.fileUrl && (
                     <Button variant="outline" className="w-full" onClick={() => window.open(win.proof!.fileUrl, "_blank")}>
-                       <ExternalLink className="h-4 w-4 mr-2" /> View Submitted Array
+                       <ExternalLink className="h-4 w-4 mr-2" /> View Proof
                     </Button>
                  )}
 
@@ -139,23 +139,23 @@ export function AdminWinnersManager() {
                        <Dialog open={rejectingId === win.id} onOpenChange={(open) => !open && setRejectingId(null)}>
                          <DialogContent>
                            <DialogHeader>
-                             <DialogTitle>Reject Target Proof</DialogTitle>
+                             <DialogTitle>Reject Proof</DialogTitle>
                              <DialogDescription>
-                               Identify explicitly the validation parameter failing internally to resolve parameters.
+                               Please state why this proof is being rejected.
                              </DialogDescription>
                            </DialogHeader>
                            <div className="py-4">
                              <Label>Rejection Reason</Label>
                              <Input 
                                className="mt-2" 
-                               placeholder="Validation array explicitly overlapping..." 
+                               placeholder="Image is too blurry..." 
                                value={rejectionReason} 
                                onChange={e => setRejectionReason(e.target.value)} 
                              />
                            </div>
                            <DialogFooter>
                              <Button variant="destructive" disabled={processingId === win.id || !rejectionReason.trim()} onClick={() => handleReview(win.id, "rejected")}>
-                               {processingId === win.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <XCircle className="h-4 w-4 mr-2" />} Explicitly Reject
+                               {processingId === win.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <XCircle className="h-4 w-4 mr-2" />} Reject
                              </Button>
                            </DialogFooter>
                          </DialogContent>

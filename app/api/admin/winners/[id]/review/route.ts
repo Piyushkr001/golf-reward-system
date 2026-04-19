@@ -25,7 +25,7 @@ export async function POST(
     const [winnerBlock] = await db.select().from(winners).where(eq(winners.id, id)).limit(1);
 
     if (!winnerBlock) {
-      return NextResponse.json({ error: "Winner mapping not found physically matching your bounds." }, { status: 404 });
+      return NextResponse.json({ error: "Winner record not found." }, { status: 404 });
     }
     
     if (winnerBlock.reviewStatus !== "submitted" && winnerBlock.reviewStatus !== "rejected") {
@@ -33,7 +33,7 @@ export async function POST(
       if (!(winnerBlock.reviewStatus === "approved" && status === "rejected")) {
           // You shouldn't normally revert an approved back, but keeping logic simple. Let's block not_submitted.
           if (winnerBlock.reviewStatus === "not_submitted") {
-              return NextResponse.json({ error: "Winner has not submitted validation proofs natively." }, { status: 400 });
+              return NextResponse.json({ error: "Review status cannot be updated without a prior submission." }, { status: 400 });
           }
       }
     }
@@ -55,8 +55,8 @@ export async function POST(
        .where(eq(winners.id, id));
 
     return NextResponse.json({ success: true, newReviewStatus: status }, { status: 200 });
-  } catch (error: any) {
+    } catch (error: any) {
     console.error(`POST /api/admin/winners/${id}/review error:`, error);
-    return NextResponse.json({ error: "Failed to persist validation boundaries natively" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to process review." }, { status: 500 });
   }
 }
