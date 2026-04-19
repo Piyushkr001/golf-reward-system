@@ -11,7 +11,7 @@ import {
   getEligibleUsersForDraw, 
   generateWinningNumbers, 
   calculatePrizePools, 
-  getUserLatest5Scores, 
+  getUsersLatest5Scores, 
   calculateMatchCount 
 } from "@/lib/draws";
 
@@ -42,16 +42,19 @@ export async function POST(
     // 2. Derive Winning Numbers
     const winningNumbers = await generateWinningNumbers(draw.logicType, eligibleUsers);
     
-    // Clear old prize pools matching this ID natively ensuring idempotency
-    await db.delete(prizePools).where(eq(prizePools.drawId, id));
-    await db.delete(drawEntries).where(eq(drawEntries.drawId, id));
+    await db.transaction(async (tx) => {
+        // Clear old prize pools matching this draw ID to ensure idempotency
+        await tx.delete(prizePools).where(eq(prizePools.drawId, id));
+        await tx.delete(drawEntries).where(eq(drawEntries.drawId, id));
 
     const entriesToInsert = [];
     let fiveMatchCount = 0;
 
-    // 3. Mathematical mapping logic parsing
+    // 3. Process each eligible user
+    const userScores = await getUsersLatest5Scores(eligibleUsers);
+    
     for (const userId of eligibleUsers) {
-      const entryNumbers = await getUserLatest5Scores(userId);
+      const entryNumbers = userScores[userId] || [];
       const matchCount = calculateMatchCount(entryNumbers, winningNumbers);
       const isWinner = matchCount >= 3;
       
@@ -69,22 +72,22 @@ export async function POST(
       });
     }
 
-    // 4. Mathematical Prize Pool Rollover Implementation
+    // 4. Calculate Prize Pool Allocation
     const poolConfig = calculatePrizePools(eligibleUsers.length);
     let rolloverAmount = 0;
 
     if (fiveMatchCount === 0) {
-        // Roll over the absolute 5-match allocation structurally 
+        // Roll over 5-match allocation if no winners
         rolloverAmount = poolConfig.fiveMatchPool;
         poolConfig.fiveMatchPool = 0;
     }
 
-    // Insert structural tracking entities safely 
+    // Insert entries into database
     if (entriesToInsert.length > 0) {
-        await db.insert(drawEntries).values(entriesToInsert);
+        await tx.insert(drawEntries).values(entriesToInsert);
     }
     
-    await db.insert(prizePools).values({
+    await tx.insert(prizePools).values({
       id: crypto.randomUUID(),
       drawId: id,
       totalPool: poolConfig.totalPool,
@@ -94,8 +97,8 @@ export async function POST(
       rolloverIntoNext: rolloverAmount,
     });
 
-    // 5. Commit draw payload safely persisting rollover tracker on central obj 
-    await db.update(draws)
+    // 5. Commit draw state and rollover
+    await tx.update(draws)
       .set({
         winningNumbers,
         rolloverAmount,
@@ -103,6 +106,8 @@ export async function POST(
         updatedAt: new Date()
       })
       .where(eq(draws.id, id));
+      
+    });
 
     return NextResponse.json({ success: true, winningNumbers, entryCount: eligibleUsers.length }, { status: 200 });
   } catch (error: any) {

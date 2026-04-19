@@ -6,7 +6,7 @@ import { ModeToggle } from "@/components/Modetoggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LogOut } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 interface AppTopbarProps {
   role: "user" | "admin" | string;

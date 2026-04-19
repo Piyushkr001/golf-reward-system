@@ -78,7 +78,7 @@ export function UserDashboardSummary() {
           title="Lifetime Accrued Value" 
           value={`$${summary.winnings.totalPrizeValue.toLocaleString()}`} 
           icon={Banknote} 
-          description="Value linked successfully natively" 
+          description="Total lifetime value from all prizes" 
        />
     </div>
   );

@@ -94,7 +94,7 @@ export function UserDrawView() {
                    <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
                    <div className="text-sm text-muted-foreground">
                     <p className="font-medium text-foreground">You were not eligible for this draw.</p>
-                    Ensure your subscription is active and you have logged at least 5 scores to enter automatically next month natively.
+                    Ensure your subscription is active and you have logged at least 5 scores to enter automatically next month.
                    </div>
                 </div>
               )}
@@ -134,7 +134,7 @@ export function UserDrawView() {
           </div>
         ))}
         {myEntries.filter(e => e.drawId !== latestDraw?.id).length === 0 && (
-          <p className="text-sm text-muted-foreground col-span-full">No historical draws available to show natively.</p>
+          <p className="text-sm text-muted-foreground col-span-full">No historical draws available to show.</p>
         )}
       </div>
     </div>

@@ -22,7 +22,7 @@ export async function POST(
       return NextResponse.json({ error: "Winner record not found." }, { status: 404 });
     }
 
-    // Check bounds! Admins cannot trigger paid statuses safely natively unless physically approved inside previous states
+    // Ensure transitions are valid
     if (winnerBlock.payoutStatus !== "approved_for_payment") {
        return NextResponse.json({ error: "Only approved items can be shifted to paid status." }, { status: 400 });
     }

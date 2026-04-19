@@ -10,7 +10,7 @@ export default function AdminDrawsPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Draw Engine Terminal</h2>
           <p className="text-muted-foreground max-w-2xl mt-2">
-            Configure parameters, safely isolate algorithms executing score-set simulations, and lock arrays explicitly into Production natively through publication hooks.
+            Configure draw parameters, run simulations, and safely publish finalized draws here.
           </p>
         </div>
         

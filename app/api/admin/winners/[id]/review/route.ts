@@ -44,7 +44,7 @@ export async function POST(
         newPayoutStatus = "approved_for_payment";
     }
 
-    // Execute Native Mutation tracking reason explicitly if rejected natively
+    // Update winner status and reason
     await db.update(winners)
        .set({ 
          reviewStatus: status, 

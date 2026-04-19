@@ -43,6 +43,26 @@ export async function getUserLatest5Scores(userId: string): Promise<number[]> {
   return scores.map(s => s.score);
 }
 
+import { inArray } from "drizzle-orm";
+
+export async function getUsersLatest5Scores(userIds: string[]): Promise<Record<string, number[]>> {
+  if (userIds.length === 0) return {};
+  
+  const allScores = await db
+    .select({ userId: golfScores.userId, score: golfScores.score })
+    .from(golfScores)
+    .where(inArray(golfScores.userId, userIds))
+    .orderBy(desc(golfScores.scoreDate), desc(golfScores.createdAt));
+    
+  const grouped: Record<string, number[]> = {};
+  for (const s of allScores) {
+     if (!grouped[s.userId]) grouped[s.userId] = [];
+     if (grouped[s.userId].length < 5) grouped[s.userId].push(s.score);
+  }
+  
+  return grouped;
+}
+
 function getRandomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -52,8 +72,10 @@ export async function generateWinningNumbers(logicType: "random" | "algorithmic"
 
   if (logicType === "algorithmic" && eligibleUsers.length > 0) {
     const frequencies: Record<number, number> = {};
+    const userScores = await getUsersLatest5Scores(eligibleUsers);
+    
     for (const userId of eligibleUsers) {
-      const scores = await getUserLatest5Scores(userId);
+      const scores = userScores[userId] || [];
       for (const s of scores) {
         frequencies[s] = (frequencies[s] || 0) + 1;
       }
@@ -83,7 +105,7 @@ export function calculateMatchCount(entryNumbers: number[], winningNumbers: numb
 }
 
 export function calculatePrizePools(eligibleCount: number) {
-  // Assume each eligible subscriber contributes internal 10 units mathematically
+  // Assume each eligible subscriber contributes 10 units mathematically
   const totalPool = eligibleCount * 10;
   
   return {

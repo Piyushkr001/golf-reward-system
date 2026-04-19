@@ -5,31 +5,31 @@ import { eq } from "drizzle-orm";
 export async function createWinnerRecordsForDraw(drawId: string, tx?: any) {
   const dbConn = tx || db;
 
-  // 1. Fetch source constraints mapped explicitly
+  // 1. Fetch draw and prize pool
   const [draw] = await dbConn.select().from(draws).where(eq(draws.id, drawId)).limit(1);
-  if (!draw) throw new Error("Draw not securely found");
+  if (!draw) throw new Error("Draw not found");
 
   const [pool] = await dbConn.select().from(prizePools).where(eq(prizePools.drawId, drawId)).limit(1);
   if (!pool) throw new Error("Prize pool missing for target draw");
 
   const entries = await dbConn.select().from(drawEntries).where(eq(drawEntries.drawId, drawId));
 
-  // Identify mathematical array lengths
+  // Bucket entries by match count
   const match5Entries = entries.filter((e: { matchCount: number; }) => e.matchCount === 5);
   const match4Entries = entries.filter((e: { matchCount: number; }) => e.matchCount === 4);
   const match3Entries = entries.filter((e: { matchCount: number; }) => e.matchCount === 3);
 
-  // Divide raw totals seamlessly formatting boundaries dynamically ignoring overlaps
+  // Calculate payout amount per tier
   const getPayoutAmount = (count: number, rawPool: number) => {
       if (count === 0) return 0;
-      return Math.floor(rawPool / count); // Splitting cleanly dropping fractional cents cleanly
+      return Math.floor(rawPool / count);
   };
 
   const payout5Match = getPayoutAmount(match5Entries.length, pool.fiveMatchPool);
   const payout4Match = getPayoutAmount(match4Entries.length, pool.fourMatchPool);
   const payout3Match = getPayoutAmount(match3Entries.length, pool.threeMatchPool);
 
-  // Safely erase previously configured iterations handling duplicate publish triggers
+  // Delete existing winners for this draw to handle duplicate publishes
   await dbConn.delete(winners).where(eq(winners.drawId, drawId));
 
   const insertQueue: {
@@ -62,7 +62,7 @@ export async function createWinnerRecordsForDraw(drawId: string, tx?: any) {
       });
   }
 
-  // Push cleanly into Schema if elements exist!
+  // Bulk insert winner records
   if (insertQueue.length > 0) {
       await dbConn.insert(winners).values(insertQueue);
   }
