@@ -8,7 +8,8 @@ import {
   Target,
   ShieldAlert,
   HeartHandshake,
-  Gift
+  Gift,
+  Award
 } from "lucide-react";
 import {
   Sidebar,
@@ -45,6 +46,11 @@ const userRoutes = [
     url: "/dashboard/draws",
     icon: Gift,
   },
+  {
+    title: "My Winnings",
+    url: "/dashboard/winnings",
+    icon: Award,
+  },
 ];
 
 const adminRoutes = [
@@ -62,6 +68,11 @@ const adminRoutes = [
     title: "Draw Simulator",
     url: "/admin/draws",
     icon: Gift,
+  },
+  {
+    title: "Winners & Payouts",
+    url: "/admin/winners",
+    icon: Award,
   },
 ];
 
