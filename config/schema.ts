@@ -193,32 +193,44 @@ export const golfScores = pgTable(
 export const drawLogicTypeEnum = pgEnum("draw_logic_type", ["random", "algorithmic"]);
 export const drawStatusEnum = pgEnum("draw_status", ["draft", "simulated", "published"]);
 
-export const draws = pgTable("draws", {
-  id: text("id").primaryKey(),
-  month: integer("month").notNull(),
-  year: integer("year").notNull(),
-  logicType: drawLogicTypeEnum("logic_type").notNull(),
-  status: drawStatusEnum("status").notNull().default("draft"),
-  winningNumbers: json("winning_numbers").$type<number[]>(),
-  rolloverAmount: integer("rollover_amount").notNull().default(0),
-  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
-  publishedAt: timestamp("published_at", { mode: "date" }),
-});
+export const draws = pgTable(
+  "draws",
+  {
+    id: text("id").primaryKey(),
+    month: integer("month").notNull(),
+    year: integer("year").notNull(),
+    logicType: drawLogicTypeEnum("logic_type").notNull(),
+    status: drawStatusEnum("status").notNull().default("draft"),
+    winningNumbers: json("winning_numbers").$type<number[]>(),
+    rolloverAmount: integer("rollover_amount").notNull().default(0),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    publishedAt: timestamp("published_at", { mode: "date" }),
+  },
+  (table) => ({
+    drawsMonthYearIdx: uniqueIndex("draws_month_year_idx").on(table.month, table.year),
+  })
+);
 
-export const drawEntries = pgTable("draw_entries", {
-  id: text("id").primaryKey(),
-  drawId: text("draw_id").notNull().references(() => draws.id, {
-    onDelete: "cascade",
-  }),
-  userId: text("user_id").notNull().references(() => users.id, {
-    onDelete: "cascade",
-  }),
-  entryNumbers: json("entry_numbers").$type<number[]>().notNull(),
-  matchCount: integer("match_count"),
-  isWinner: boolean("is_winner").notNull().default(false),
-  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-});
+export const drawEntries = pgTable(
+  "draw_entries",
+  {
+    id: text("id").primaryKey(),
+    drawId: text("draw_id").notNull().references(() => draws.id, {
+      onDelete: "cascade",
+    }),
+    userId: text("user_id").notNull().references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    entryNumbers: json("entry_numbers").$type<number[]>().notNull(),
+    matchCount: integer("match_count"),
+    isWinner: boolean("is_winner").notNull().default(false),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    drawEntriesDrawUserIdx: uniqueIndex("draw_entries_draw_user_idx").on(table.drawId, table.userId),
+  })
+);
 
 export const prizePools = pgTable("prize_pools", {
   id: text("id").primaryKey(),

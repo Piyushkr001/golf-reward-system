@@ -32,8 +32,8 @@ export async function POST(
     if (!draw) {
       return NextResponse.json({ error: "Draw not found" }, { status: 404 });
     }
-    if (draw.status !== "draft") {
-      return NextResponse.json({ error: "Only draft draws can be simulated" }, { status: 400 });
+    if (draw.status !== "draft" && draw.status !== "simulated") {
+      return NextResponse.json({ error: "Only draft or simulated draws can be evaluated" }, { status: 400 });
     }
 
     // 1. Fetch eligible users
@@ -41,33 +41,25 @@ export async function POST(
 
     // 2. Derive Winning Numbers
     const winningNumbers = await generateWinningNumbers(draw.logicType, eligibleUsers);
-
-    // 3. Mathematical Prize Pool Mapping
-    const poolConfig = calculatePrizePools(eligibleUsers.length);
     
-    // Clear old prize pools matching this ID just in case it's a re-sim
+    // Clear old prize pools matching this ID natively ensuring idempotency
     await db.delete(prizePools).where(eq(prizePools.drawId, id));
-    
-    // Build new pool
-    await db.insert(prizePools).values({
-      id: crypto.randomUUID(),
-      drawId: id,
-      totalPool: poolConfig.totalPool,
-      fiveMatchPool: poolConfig.fiveMatchPool,
-      fourMatchPool: poolConfig.fourMatchPool,
-      threeMatchPool: poolConfig.threeMatchPool,
-      rolloverIntoNext: 0,
-    });
-
-    // 4. Transform scores into entries
     await db.delete(drawEntries).where(eq(drawEntries.drawId, id));
 
+    const entriesToInsert = [];
+    let fiveMatchCount = 0;
+
+    // 3. Mathematical mapping logic parsing
     for (const userId of eligibleUsers) {
       const entryNumbers = await getUserLatest5Scores(userId);
       const matchCount = calculateMatchCount(entryNumbers, winningNumbers);
       const isWinner = matchCount >= 3;
+      
+      if (matchCount === 5) {
+          fiveMatchCount++;
+      }
 
-      await db.insert(drawEntries).values({
+      entriesToInsert.push({
         id: crypto.randomUUID(),
         drawId: id,
         userId,
@@ -77,10 +69,36 @@ export async function POST(
       });
     }
 
-    // 5. Commit draw payload
+    // 4. Mathematical Prize Pool Rollover Implementation
+    const poolConfig = calculatePrizePools(eligibleUsers.length);
+    let rolloverAmount = 0;
+
+    if (fiveMatchCount === 0) {
+        // Roll over the absolute 5-match allocation structurally 
+        rolloverAmount = poolConfig.fiveMatchPool;
+        poolConfig.fiveMatchPool = 0;
+    }
+
+    // Insert structural tracking entities safely 
+    if (entriesToInsert.length > 0) {
+        await db.insert(drawEntries).values(entriesToInsert);
+    }
+    
+    await db.insert(prizePools).values({
+      id: crypto.randomUUID(),
+      drawId: id,
+      totalPool: poolConfig.totalPool,
+      fiveMatchPool: poolConfig.fiveMatchPool,
+      fourMatchPool: poolConfig.fourMatchPool,
+      threeMatchPool: poolConfig.threeMatchPool,
+      rolloverIntoNext: rolloverAmount,
+    });
+
+    // 5. Commit draw payload safely persisting rollover tracker on central obj 
     await db.update(draws)
       .set({
         winningNumbers,
+        rolloverAmount,
         status: "simulated",
         updatedAt: new Date()
       })

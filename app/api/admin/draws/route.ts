@@ -16,15 +16,31 @@ export async function GET(req: NextRequest) {
       .from(draws)
       .orderBy(desc(draws.createdAt));
 
-    // For each draw, pull basic metadata
+    // For each draw, pull basic metadata including internal match count mappings
     const enhancedDraws = await Promise.all(
       allDraws.map(async (d) => {
         const pools = await db.select().from(prizePools).where(eq(prizePools.drawId, d.id)).limit(1);
-        const [entryCount] = await db.select({ total: count() }).from(drawEntries).where(eq(drawEntries.drawId, d.id));
+        const entries = await db.select({ matchCount: drawEntries.matchCount }).from(drawEntries).where(eq(drawEntries.drawId, d.id));
+        
+        let fiveMatch = 0;
+        let fourMatch = 0;
+        let threeMatch = 0;
+
+        for (const e of entries) {
+           if (e.matchCount === 5) fiveMatch++;
+           if (e.matchCount === 4) fourMatch++;
+           if (e.matchCount === 3) threeMatch++;
+        }
+
         return {
           ...d,
           prizePool: pools[0] || null,
-          participantCount: entryCount.total || 0,
+          participantCount: entries.length || 0,
+          winnerCounts: {
+            five: fiveMatch,
+            four: fourMatch,
+            three: threeMatch
+          }
         };
       })
     );
