@@ -1,6 +1,6 @@
 import { db } from "@/config/db";
 import { users, subscriptions, charities, draws, winners } from "@/config/schema";
-import { count, sum, eq, and } from "drizzle-orm";
+import { count, sum, eq, and, desc } from "drizzle-orm";
 
 export async function getAdminAnalyticsSummary() {
   // Aggregate distinct counts natively pushing processing bounds to Postgres efficiently
@@ -42,7 +42,7 @@ export async function getAdminAnalyticsSummary() {
 }
 
 export async function getUserDashboardSummary(userId: string) {
-  const [userSubs] = await db.select().from(subscriptions).where(eq(subscriptions.userId, userId)).limit(1);
+  const [userSubs] = await db.select().from(subscriptions).where(eq(subscriptions.userId, userId)).orderBy(desc(subscriptions.createdAt)).limit(1);
   
   const [totalWinnings] = await db.select({ value: count() }).from(winners).where(eq(winners.userId, userId));
   const [pendingPayouts] = await db.select({ value: count() }).from(winners).where(and(eq(winners.userId, userId), eq(winners.payoutStatus, "approved_for_payment")));

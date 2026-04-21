@@ -26,8 +26,7 @@ export async function POST(
       return NextResponse.json({ error: "Only simulated draws can be published" }, { status: 400 });
     }
 
-    await db.transaction(async (tx) => {
-      await tx.update(draws)
+      await db.update(draws)
         .set({
           status: "published",
           publishedAt: new Date(),
@@ -35,8 +34,7 @@ export async function POST(
         })
         .where(eq(draws.id, id));
 
-      await createWinnerRecordsForDraw(id, tx);
-    });
+      await createWinnerRecordsForDraw(id);
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {

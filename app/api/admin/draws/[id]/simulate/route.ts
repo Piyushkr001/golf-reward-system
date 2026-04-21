@@ -42,10 +42,9 @@ export async function POST(
     // 2. Derive Winning Numbers
     const winningNumbers = await generateWinningNumbers(draw.logicType, eligibleUsers);
     
-    await db.transaction(async (tx) => {
-        // Clear old prize pools matching this draw ID to ensure idempotency
-        await tx.delete(prizePools).where(eq(prizePools.drawId, id));
-        await tx.delete(drawEntries).where(eq(drawEntries.drawId, id));
+    // Clear old prize pools matching this draw ID to ensure idempotency
+    await db.delete(prizePools).where(eq(prizePools.drawId, id));
+    await db.delete(drawEntries).where(eq(drawEntries.drawId, id));
 
     const entriesToInsert = [];
     let fiveMatchCount = 0;
@@ -84,10 +83,10 @@ export async function POST(
 
     // Insert entries into database
     if (entriesToInsert.length > 0) {
-        await tx.insert(drawEntries).values(entriesToInsert);
+        await db.insert(drawEntries).values(entriesToInsert);
     }
     
-    await tx.insert(prizePools).values({
+    await db.insert(prizePools).values({
       id: crypto.randomUUID(),
       drawId: id,
       totalPool: poolConfig.totalPool,
@@ -98,7 +97,7 @@ export async function POST(
     });
 
     // 5. Commit draw state and rollover
-    await tx.update(draws)
+    await db.update(draws)
       .set({
         winningNumbers,
         rolloverAmount,
@@ -106,8 +105,6 @@ export async function POST(
         updatedAt: new Date()
       })
       .where(eq(draws.id, id));
-      
-    });
 
     return NextResponse.json({ success: true, winningNumbers, entryCount: eligibleUsers.length }, { status: 200 });
   } catch (error: any) {
